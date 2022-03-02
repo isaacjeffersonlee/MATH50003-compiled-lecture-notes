@@ -1,6 +1,6 @@
 # MATH50003 Numerical Analysis Lecture Notes
 
-**Original Author: Dr. Sheehan Olver   Compiled by: Isaac Lee**     |     **Date: 26/02/2022**
+**Original Author: Dr. Sheehan Olver     |   Compiled by: Isaac Lee**     |     **Date: 26/02/2022**
 
 ## Description
 This repository contains the source markdown files and different
