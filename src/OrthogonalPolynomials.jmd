@@ -1,0 +1,631 @@
+# Orthogonal Polynomials
+
+Fourier series proved very powerful for approximating periodic functions.
+If periodicity is lost, however, uniform convergence is lost. In this chapter
+we introduce alternative bases, _orthogonal polynomials (OPs)_ built on polynomials that are applicable in
+the non-periodic setting. That is we consider expansions of the form
+$$
+f(x) = \sum_{k=0}^∞ c_k p_k(x) ≈ \sum_{k=0}^{n-1} c_k^n p_k(x)
+$$
+where $p_k(x)$ are special families of polynomials, $c_k$ are expansion coefficients and
+$c_k^n$ are approximate coefficients.
+
+Why not use monomials as in Taylor series? Hidden in the previous lecture was that we could effectively
+compute Taylor coefficients by evaluating on the unit circle in the complex plane, _only_ if the radius of convergence
+was 1. Many functions are smooth on say $[-1,1]$ but have non-convergent Taylor series, e.g.:
+$$
+{1 \over 25x^2 + 1}
+$$
+While orthogonal polynomials span the same space as monomials, and therefore we can in theory write an
+approximation in monomials, orthogonal polynomials are _much_ more stable.
+
+
+
+In addition to numerics, OPs play a very important role in many mathematical areas
+including functional analysis, integrable systems, singular integral equations,
+complex analysis, and random matrix theory.
+
+1. General properties of OPs: we define orthogonal polynomials, three-term recurrences and Jacobi operators
+2. Classical OPs: we define Chebyshev, Legendre, Jacobi, Laguerre, and Hermite.
+3. Gaussian quadrature: we see that OPs can be used to construct effective numerical methods for singular integrals
+4. Recurrence relationships and Sturm–Liouville equations: we see that classical OPs have many simple recurrences that
+are of importance in computation, which also show they are eigenfunctions of simple differential operators.
+
+
+## 1. General properties of orthogonal polynomials
+
+**Definition (graded polynomial basis)**
+A set of polynomials $\{p_0(x), p_1(x), … \}$ is _graded_ if $p_n$ is
+precisely degree $n$: i.e.,
+$$
+p_n(x) = k_n x^n + k_n^{(n-1)} x^{n-1} + ⋯ + k_n^{(1)} x + k_n^{(0)}
+$$
+for $k_n ≠ 0$.
+
+Note that if $p_n$ are graded then $\{p_0(x), …, p_n(x) \}$
+are a basis of all polynomials of degree $n$.
+
+
+**Definition (orthogonal polynomials)**
+Given an (integrable) _weight_ $w(x) > 0$ for $x ∈ (a,b)$,
+which defines a continuous inner product
+$$
+⟨f,g⟩ = ∫_a^b  f(x) g(x) w(x) {\rm d} x
+$$
+a graded polynomial basis $\{p_0(x), p_1(x), … \}$
+are _orthogonal polynomials (OPs)_ if
+$$
+⟨p_n,p_m⟩ = 0
+$$
+whenever $n ≠ m$.
+
+
+Note in the above
+$$
+h_n := ⟨p_n,p_n⟩ = \|p_n\|^2 = ∫_a^b  p_n(x)^2 w(x) {\rm d} x > 0.
+$$
+
+**Definition (orthonormal polynomials)**
+A set of orthogonal polynomials $\{q_0(x), q_1(x), … \}$
+are orthonormal if $\|q_n\| = 1$.
+
+**Definition (monic orthogonal polynomials)**
+A set of orthogonal polynomials $\{q_0(x), q_1(x), … \}$
+are orthonormal if $k_n = 1$.
+
+
+**Proposition (expansion)**
+If $r(x)$ is a degree $n$ polynomial, $\{p_n\}$ are orthogonal
+and $\{q_n\}$ are orthonormal then
+$$
+\begin{align*}
+r(x) &= ∑_{k=0}^n {⟨p_k,r⟩ \over \|p_k\|^2} p_k(x) \\
+     &    = ∑_{k=0}^n ⟨q_k,r⟩ q_k(x)
+\end{align*}
+$$
+
+**Proof**
+Because $\{p_0,…,p_n \}$ are a basis of polynomials we can
+write
+$$
+r(x) = ∑_{k=0}^n r_k p_k(x)
+$$
+for constants $r_k ∈ ℝ$.
+By linearity we have
+$$
+⟨p_m,r⟩ = ∑_{k=0}^n r_k ⟨p_m,p_k⟩= r_m ⟨p_m,p_m⟩
+$$
+∎
+
+**Corollary (zero inner product)**
+If a degree $n$ polynomial $r$ satisfies
+$$
+0 = ⟨p_0,r⟩ = … = ⟨p_n,r⟩
+$$
+then $r = 0$.
+
+
+OPs are uniquely defined (up to a constant) by the
+property that they are orthogonal to all lower degree polynomials.
+
+**Proposition (orthogonal to lower degree)**
+A polynomial $p$ of precisely degree $n$ satisfies
+$$
+⟨p,r⟩ = 0
+$$
+for all degree $m < n$ polynomials $r$ if and only if
+$p = c q_n$. Therefore an orthogonal polynomial is uniquely
+defined by $k_n$.
+
+**Proof**
+As $\{p_0,…,p_n\}$ are a basis of all polynomials of degree $n$,
+we can write
+$$
+r(x) = ∑_{k=0}^m a_k p_k(x)
+$$
+Thus by linearity of inner products we have
+$$
+⟨cp_n,∑_{k=0}^m a_k p_k⟩ = ∑_{k=0}^m ca_k ⟨p_n, p_k⟩ = 0.
+$$
+
+Now for
+$$
+p(x) = c x^n + O(x^{n-1})
+$$
+consider $p(x) - c p_n(x)$ which is of degree $n-1$. It satisfies
+for $k ≤ n-1$
+$$
+⟨p_k, p - c p_n⟩ = ⟨p_k, p⟩ - c ⟨p_k, p_n⟩ = 0.
+$$
+Thus it is zero, i.e., $p(x) = c p_n(x)$.
+
+∎
+
+A consequence of this is that orthonormal polynomials are always a
+constant multiple of orthogonal polynomials.
+
+
+### 3-term recurrence
+
+The most _fundamental_ property of orthogonal polynomials is their three-term
+recurrence.
+
+**Theorem (3-term recurrence, 2nd form)**
+If $\{p_n\}$ are OPs then there exist real constants
+$a_n, b_n ≠0,c_{n-1} ≠0$
+such that
+$$
+\begin{align*}
+x p_0(x) &= a_0 p_0(x) + b_0 p_1(x)  \\
+x p_n(x) &= c_{n-1} p_{n-1}(x) + a_n p_n(x) + b_n p_{n+1}(x)
+\end{align*}
+$$
+**Proof**
+The $n=0$ case is immediate since $\{p_0,p_1\}$ are a basis of degree 1 polynomials.
+The $n >0$ case follows from
+$$
+⟨x p_n, p_k⟩ = ⟨ p_n, xp_k⟩ = 0
+$$
+for $k < n-1$ as $x p_k$ is of degree $k+1 < n$.
+
+Note that
+$$
+b_n = {⟨p_{n+1}, x p_n⟩ \over \|p_{n+1} \|^2} ≠ 0
+$$
+since $x p_n = k_n x^{n+1} + O(x^n)$ is precisely degree
+$n$. Further,
+$$
+c_{n-1} = {⟨p_{n-1}, x p_n⟩ \over \|p_{n-1}\|^2 } =
+{⟨p_n, x p_{n-1}⟩  \over \|p_{n-1}\|^2 } =  b_{n-1}{\|p_n\|^2  \over \|p_{n-1}\|^2 } ≠ 0.
+$$
+
+
+
+∎
+
+
+
+
+Clearly if $p_n$ is monic then so is $x p_n$ which leads to the following:
+
+**Corollary (monic 3-term recurrence)** If
+$\{p_n\}$ are monic then $b_n =  1$.
+
+
+**Example** What are the  monic OPs $p_0(x),…,p_3(x)$ with respect to $w(x) = 1$ on $[0,1]$?
+We can construct these using Gram–Schmidt, but exploiting the 3-term recurrence to reduce the computational cost.
+We have $p_0(x) = q_0(x) = 1$, which we see is orthogonal:
+$$
+\|p_0\|^2 = ⟨p_0,p_0⟩ = ∫_0^1 {\rm d x} = 1.
+$$
+We know from the 3-term recurrence that
+$$
+x p_0(x) = a_0 p_0(x) +  p_1(x)
+$$
+where
+$$
+a_0 = {⟨p_0,x p_0⟩  \over \|p_0\|^2} = ∫_0^1 x {\rm d} x = 1/2.
+$$
+Thus
+$$
+\begin{align*}
+p_1(x) = x p_0(x) - a_0 p_0(x) = x-1/2 \\
+\|p_1\|^2 = ∫_0^1 (x^2 - x + 1/4) {\rm d} x = 1/12
+\end{align*}
+$$
+From
+$$
+x p_1(x) = c_0 p_0(x) + a_1 p_1(x) +  p_2(x)
+$$
+we have
+$$
+\begin{align*}
+c_0 &= {⟨p_0,x p_1⟩  \over \|p_0\|^2} = ∫_0^1 (x^2 - x/2) {\rm d} x = 1/12 \\
+a_1 &= {⟨p_1,x p_1⟩  \over \|p_1\|^2} = 12 ∫_0^1 (x^3 - x^2 + x/4) {\rm d} x = 1/2 \\
+p_2(x) &= x p_1(x) - c_0 - a_1 p_1(x) = x^2 - x + 1/6 \\
+\|p_2\|^2 &= \int_0^1 (x^4 - 2x^3 + 4x^2/3 - x/3 + 1/36) {\rm d} x = {1 \over 180}
+\end{align*}
+$$
+Finally, from
+$$
+x p_2(x) = c_1 p_1(x) + a_2 p_2(x) +  p_3(x)
+$$
+we have
+$$
+\begin{align*}
+c_1 &= {⟨p_1,x p_2⟩  \over \|p_1\|^2} = 12 ∫_0^1 (x^4 - 3x^3/2 +2x^2/3 -x/12)  {\rm d} x = 1/15 \\
+a_2 &= {⟨p_2,x p_2⟩  \over \|p_2\|^2} = 180 ∫_0^1 (x^5 - 2x^4 +4x^3/3 - x^2/3 + x/36) {\rm d} x = 1/2 \\
+p_3(x) &= x p_2(x) - c_1 p_1(x)- a_2 p_2(x) = x^3 - x^2 + x/6 - x/15 + 1/30 -x^2/2 + x/2 - 1/12 \\
+&= x^3 - 3x^2/2 + 3x/5 -1/20
+\end{align*}
+$$
+
+
+### Jacobi matrix
+
+
+The three-term recurrence can also be interpreted as a matrix known
+as the Jacobi matrix:
+
+**Corollary (Jacobi matrix)**
+For
+$$
+P(x) := [p_0(x) | p_1(x) | ⋯]
+$$
+then we have
+$$
+x P(x) = P(x) \underbrace{\begin{bmatrix} a_0 & c_0 \\
+                                                        b_0 & a_1 & c_1\\
+                                                        & b_1 & a_2 & ⋱ \\
+                                                        && ⋱ & ⋱
+                                                        \end{bmatrix}}_X
+$$
+More generally, for any polynomial $a(x)$ we have
+$$
+a(x) P(x) = P(x) a(X).
+$$
+
+For the special cases of orthonormal and monic polynomials we have extra structure:
+
+**Corollary (orthonormal 3-term recurrence)** If
+$\{q_n\}$ are orthonormal then its recurrence coefficients satisfy $c_n = b_n$.
+That is, the Jacobi matrix is symmetric:
+$$
+X = \begin{bmatrix} a_0 & b_0 \\
+                                                        b_0 & a_1 & b_1\\
+                                                        & b_1 & a_2 & ⋱ \\
+                                                        && ⋱ & ⋱
+                                                        \end{bmatrix}
+$$
+
+**Proof**
+$$
+b_n = ⟨x q_n, q_{n+1}⟩ = ⟨q_n, x q_{n+1}⟩ = c_{n-1}.
+$$
+∎
+
+
+
+**Remark** Typically the Jacobi matrix is the transpose $J := X^⊤$.
+If the basis are orthonormal then $X$ is symmetric and they are the same.
+
+**Remark (advanced)** If you are worried about multiplication of infinite matrices/vectors
+note it is well-defined by the standard definition because it is banded.
+It can also be defined in terms of functional analysis where one considers these
+as linear operators (functions of functions) between vector spaces.
+
+**Remark (advanced)** Every integrable weight generates a family of
+orthonormal polynomials, which in turn generates a symmetric Jacobi matrix.
+There is a "Spectral Theorem for Jacobi matrices" that says one can go the
+other way: every tridiagonal symmetric matrix with bounded entries is a Jacobi
+matrix for some integrable weight with compact support. This is an example of what
+[Barry Simon](https://en.wikipedia.org/wiki/Barry_Simon) calls a ``Gem of spectral theory'',
+that is.
+
+
+**Example (uniform weight Jacobi matrix)** Consider the
+monic orthogonal polynomials $p_0(x),p_1(x),…,p_3(x)$ for $w(x) = 1$ on $[0,1]$ constructed above.
+We can write the 3-term recurrence coefficients we have computed above as the Jacobi matrix:
+$$
+x [p_0(x)| p_1(x)| ⋯] = [p_0(x)| p_1(x)| ⋯] \underbrace{\begin{bmatrix} 1/2 & 1/12 \\
+                                                            1 & 1/2 & 1/15 \\
+                                                            & 1 & 1/2 & ⋱ \\
+                                                            & & ⋱ & ⋱ \end{bmatrix}}_X
+$$
+We can compute the orthonormal polynomials, using
+$$
+\|p_3\|^2 = \int_0^1 (x^6 - 3x^5 + 69x^4/20 -19x^3/10 + 51x^2/100 - 3x/50 + 1/400) {\rm d}x = {1 \over 2800}
+$$
+as:
+$$
+\begin{align*}
+q_0(x) &= p_0(x) \\
+q_1(x) &= \sqrt{12} p_1(x)= \sqrt{3} (2  x - 1) \\
+q_2(x) &= \sqrt{180} p_2(x) = \sqrt{5} (6x^2 - 6x + 1) \\
+q_3(x) &= \sqrt{2800} p_3(x) = \sqrt{7} (20x^3-30x^2 + 12x - 1)
+\end{align*}
+$$
+which have the Jacobi matrix
+$$
+x [q_0(x)| q_1(x)| ⋯] = x [p_0(x)| p_1(x)| ⋯] \underbrace{\begin{bmatrix} 1 \\ & 2\sqrt{3} \\ && 6 \sqrt{5} \\ &&& 20 \sqrt{7} \\
+&&&& ⋱
+\end{bmatrix}}_D = [q_0(x)| q_1(x)| ⋯] D^{-1} X D = 
+     \begin{bmatrix} 1/2 & 1/\sqrt{12} \\
+                    1/\sqrt{12} & 1/2 &  1/\sqrt{15} \\
+                    & 1/\sqrt{15} & 1/2 & ⋱ \\
+                    & ⋱ & ⋱ \end{bmatrix}
+$$
+which is indeed symmetric. The problem sheet explores a more elegant way of doing this.
+
+
+**Example (expansion)** Consider expanding a low degree polynomial like $f(x) = x^2$ in $p_n(x)$. We have
+$$
+⟨p_0, f⟩ = ∫_0^1 x^2 {\rm d} x = 1/3
+⟨p_1, f⟩ = ∫_0^1 x^2 (x - 1/2) {\rm d} x = 1/12
+⟨p_2, f⟩ = ∫_0^1 x^2 (x^2 - x + 1/6) {\rm d} x = 1/180
+$$
+Thus we have:
+$$
+f(x) = {p_0(x) \over 3} + p_1(x) + p_2(x) = [p_0(x) | p_1(x) | p_2(x) | ⋯] \begin{bmatrix} 1/3 \\ 1 \\ 1 \\ 0 \\ ⋮ \end{bmatrix}
+$$
+We multiply (using that $b_2 = 1$ for monic OPs) to deduce:
+$$
+\begin{align*}
+x f(x) = x[p_0(x) | p_1(x) | p_2(x) | ⋯] \begin{bmatrix} 1/3 \\ 1 \\ 1 \\ 0 \\ ⋮ \end{bmatrix} \\
+&= [p_0(x) | p_1(x) | p_2(x) | ⋯] X \begin{bmatrix} 1/3 \\ 1 \\ 1 \\ 0 \\ ⋮ \end{bmatrix}
+= [p_0(x) | p_1(x) | p_2(x) | ⋯]  \begin{bmatrix} 1/4 \\ 9/10 \\ 3/2 \\ 1 \\ 0 \\ ⋮ \end{bmatrix} \\
+&= {p_0(x) \over 4} + {9 p_1(x) \over 10} + {3 p_2(x) \over 2} + p_3(x)
+\end{align*}
+$$
+
+
+
+
+## 2. Classical orthogonal polynomials
+
+Classical orthogonal polynomials are special families of orthogonal polynomials with a number
+of beautiful properties, for example
+1. Their derivatives are also OPs
+2. They are eigenfunctions of simple differential operators
+
+As stated above orthogonal polynomials are uniquely defined by the weight
+$w(x)$ and the constant $k_n$. We consider:
+
+1. Chebyshev polynomials (1st kind) $T_n(x)$: $w(x) = 1/\sqrt{1-x^2}$ on $[-1,1]$.
+2.  Chebyshev polynomials (2nd kind) $U_n(x)$: $\sqrt{1-x^2}$ on $[-1,1]$.
+2. Legendre polynomials $P_n(x)$: $w(x) = 1$ on $[-1,1]$.
+3. Hermite polynomials $H_n(x): $w(x) = \exp(-x^2)$  on $(-∞,∞)$.
+
+Other important families discussed are
+
+1. Ultrapsherical polynomials
+2. Jacobi polynomials
+3. Laguerre polynomials
+
+
+### Chebyshev
+
+**Definition (Chebyshev polynomials, 1st kind)** $T_n(x)$ are orthogonal with respect to $1/sqrt{1-x^2}$
+and satisfy:
+$$
+T_0(x) = 1, T_n(x) = 2^{n-1} x^n + O(x^{n-1})
+$$
+
+
+**Definition (Chebyshev polynomials, 2nd kind)** $T_n(x)$ are orthogonal with respect to $1/sqrt{1-x^2}$.
+$$
+U_n(x) = 2^n x^n + O(x^{n-1})
+$$
+
+
+**Theorem (Chebyshev T are cos)**
+$$
+T_n(x) = \cos n {\rm acos}\, x
+$$
+In other words
+$$
+T_n(cos(θ)) = \cos n θ.
+$$
+
+
+**Proof**
+
+We need to show that $p_n(x) := \cos n {\rm acos}\, x$ are
+1. graded polynomials
+2. orthogonal w.r.t. $1/\sqrt{1-x^2}$ on $[-1,1]$, and
+3. have the right normalisation constant $k_n = 2^{n-1}$ for $n = 2,…$.
+
+Property (2) follows under a change of variables:
+$$
+\int_{-1}^1 {p_n(x) p_m(x) \over \sqrt{1-x^2}} {\rm d} x =
+\int_{-π}^π {cos(nθ) cos(mθ) \over \sqrt{1-cos^2 θ}} \sin θ {\rm d} θ =
+\int_{-π}^π cos(nθ) cos(mθ) {\rm d} x = 0
+$$
+if $n ≠ m$.
+
+To see that they are graded we use the fact that
+$$
+x p_n(x) = \cos θ \cos n θ = {\cos(n-1)θ + cos(n+1)θ \over 2} = {p_{n-1}(x) + p_{n+1}(x) \over 2}
+$$
+In other words $p_{n+1}(x) = 2x p_n(x) - p_{n-1}(x)$.
+Since each time we multiply by $2x$ and $p_0(x) = 1$ we have
+$$
+p_n(x) = (2x)^n + O(x^{n-1})
+$$
+which completes the proof.
+
+∎
+
+Buried in the proof is the 3-term recurrence:
+
+**Corollary**
+$$
+\begin{align*}
+x T_0(x) = T_1(x) \\
+x T_n(x) = {T_{n-1}(x) + T_{n+1}(x) \over 2}
+\end{align*}
+$$
+
+In the problem sheet you will show the following:
+
+**Theorem (Chebyshev U are sin)**
+For $x = \cos θ$,
+$$
+U_n(x) = {\sin(n+1) θ \over \sin θ}
+$$
+which satisfy:
+$$
+\begin{align*}
+x U_0(x) &= U_1(x)/2 \\
+x U_n(x) &= {U_{n-1}(x) \over 2} + {U_{n+1}(x) \over 2}.
+\end{align*}
+$$
+
+### Legendre
+
+**Definition (Pochhammer symbol)** The Pochhammer symbol is
+$$
+\begin{align*}
+(a)_0 &= 1 \\
+(a)_n &= a (a+1) (a+2) ⋯ (a+n-1).
+$$
+
+**Definition (Legendre)** Legendre polynomials
+$P_n(x)$ are orthogonal polynomials with respect to $w(x) = 1$ on $[-1,1]$, with
+$$
+k_n = {2^n (1/2)_n \over n!}
+$$
+
+The reason for this complicated normalisation constant is both historical and
+that it leads to simpler formulae for recurrence relationships.
+
+
+Classical orthogonal polynomials have _Rodriguez formulae_, defining orthogonal
+polynomials as high order derivatives of simple functions. In this case we have:
+
+**Theorem (Legendre Rodriguez)**
+$$
+P_n(x) = {1 \over (-2)^n n!}{{\rm d}^n \over {\rm d} x^n} (1-x^2)^n
+$$
+
+**Proof**
+We need to verify:
+1. graded polynomials
+2. orthogonal to all lower degree polynomials on $[-1,1]$, and
+3. have the right normalisation constant $k_n = {2^n (1/2)_n \over n!}$.
+
+(1) follows since its a degree $n$ polynomial (the $n$-th derivative of a degree $2n$ polynomial).
+(2) follows by integration by parts. Note that $(1-x^2)^n$ and its first $n-1$ derivatives vanish at ±1$.
+If $r_m$ is a degree $m < n$ polynomial we have:
+$$
+∫_{-1}^1 {{\rm d}^n \over {\rm d} x^n} (1-x^2)^n r_m(x) {\rm d}x
+= -∫_{-1}^1 {{\rm d}^{n-1} \over {\rm d} x^{n-1}} (1-x^2)^n r_m'(x) {\rm d}x =
+⋯ = (-1)^n ∫_{-1}^1 (1-x^2) r_m^{(n)}(x) {\rm d}x = 0.
+$$
+(3) follows since:
+$$
+{{\rm d}^n \over {\rm d} x^n}[(-1)^n x^{2n} + O(x^{2n-1})] =
+(-1)^n 2n {{\rm d}^{n-1} \over {\rm d} x^{n-1}} x^{2n-1}+ O(x^{2n-1})] =
+(-1)^n 2n (2n-1) {{\rm d}^{n-2} \over {\rm d} x^{n-2}} x^{2n-2}+ O(x^{2n-2})] = ⋯ =
+(-1)^n 2n (2n-1) ⋯ (n+1) x^n + O(x^{n-1})
+$$
+which satisfies:
+$$
+(1/2)(1/2+1) ⋯ (n-1/2) = {1 \over 2^n} (1+2) ⋯ (2n-1)
+$$
+
+∎
+
+**Theorem (Legendre 3-term recurrence)**
+
+
+
+
+
+
+## 3. Gaussian quadrature
+
+Consider integration
+$$
+\int_a^b f(x) w(x) {\rm d}x.
+$$
+For periodic integration we approximated (using the Trapezium rule) an integral by a sum.
+We can think of it as a weighted sum:
+$$
+{1 \over 2π} \int_0^{2π} f(θ) {\rm d} θ ≈  ∑_{j=0}^{n-1} w_j f(θ_j)
+$$
+where $w_j = 1/n$. Replacing an integral by a weighted sum is a known as a _quadrature_ rule.
+This quadrature rule had several important properties:
+1. It was _exact_ for integrating trigonometric polynomials with 2n-1 coefficients
+$$
+p(θ) = \sum_{k=1-n}^{n-1} p̂_k \exp({\rm i}k θ)
+$$
+as seen by the formula
+$$
+∑_{j=0}^{n-1} w_j f(θ_j) = p̂_0^n = … + p̂_{n-1} + p̂_0 + p̂_n + ⋯ = p̂_0 = {1 \over 2π} \int_0^{2π} p(θ) {\rm d} θ
+$$
+2. It exactly recovered the coefficients ($p̂_k^n = p̂_k$) for expansions of trigonometric polynomials with $n$ coeffiicents:
+$$
+p(θ) = \sum_{k=-⌈(n-1)/2⌉}^{⌊(n-1)/2⌋} p̂_k \exp({\rm i}k θ)
+$$
+3. It converged fast for smooth, periodic functions $f$.
+
+In this section we consider other quadrature rules
+$$
+\int_a^b f(x) w(x) {\rm d}x ≈ \sum_{j=1}^n w_j f(x_j)
+$$
+We want to choose $w_j$ and $x_j$ so that the following properties are satisfied:
+1. It is _exact_ for integrating polynomials up to degree $2n-1$:
+$$
+p(θ) = \sum_{k=0}^{2n-1} c_k q_k(x)
+$$
+2. It exactly recovers the coefficients for expansions:
+$$
+p(θ) = \sum_{k=0}^{n-1} c_k q_k(x)
+$$
+3. It converges fast for smooth functions $f$.
+We will focus on properties (1) and (2) as property (3) is more involved.
+
+The key to property (1) is to use _roots (zeros) of $q_n(x)$_.
+
+**Lemma** $q_n(x)$ has exactly $n$ distinct roots.
+
+**Proof**
+
+Suppose $x_1, …,x_j$ are the roots where $q_n(x)$ changes sign, that is,
+$$
+q_n(x) = c_j (x-x_j) + O((x-x_j)^2)
+$$
+for $c_j ≠ 0$. Then
+$$
+q_n(x) (x-x_1) ⋯(x-x_j)
+$$
+does not change sign.
+In other words:
+$$
+⟨q_n,(x-x_1) ⋯(x-x_j) ⟩ = \int_a^b q_n(x) (x-x_1) ⋯(x-x_j) {\rm d} x ≠ 0.
+$$
+This is only possible if $j = n$.
+
+∎
+
+
+
+**Lemma (zeros)** The zeros $x_1, …,x_n$ of $q_n(x)$ are the eigenvalues of the truncated Jacobi matrix
+$$
+X_n := \begin{bmatrix} a_0 & b_0 \\
+                         b_0 & ⋱ & ⋱ \\
+                         & ⋱ & a_{n-2} & b_{n-2} \\
+                         && b_{n-2} & a_{n-1} \end{bmatrix} ∈ ℝ^{n × n}.
+$$
+More precisely,
+$$
+X_n Q_n = Q_n \begin{bmatrix} x_1 \\ & ⋱ \\ && x_n \end{bmatrix}
+$$
+for the orthogonal matrix
+$$
+Q_n = \begin{bmatrix}
+p_0(x_1) & ⋯ & p_0(x_n) \\
+⋮  & ⋯ & ⋮  \\
+p_{n-1}(x_1) & ⋯ & p_{n-1}(x_n)
+\end{bmatrix}
+$$
+
+**Proof**
+
+We construct the eigenvector (noting $b_{n-1} p_n(x_j) = 0$):
+$$
+X_n \begin{bmatrix} p_0(x_j) \\ ⋮ \\ p_{n-1}(x_j) \end{bmatrix} =
+\begin{bmatrix} a_0 p_0(x_j) + b_0 p_1(x_j) \\
+ b_0 p_0(x_j) + a_1 p_1(x_j) + b_1 p_2(x_j) \\
+⋮ \\
+b_{n-3} p_{n-3}(x_j) + a_{n-2} p_{n-2}(x_j) + b_{n-2} p_{n-1}(x_j) \\
+b_{n-2} p_{n-2}(x_j) + a_{n-1} p_{n-1}(x_j) + b_{n-1} p_n(x_j)
+\end{bmatrix} = x_j \begin{bmatrix} p_0(x_j) \\
+ p_1(x_j) \\
+⋮ \\
+p_n(x_j)
+\end{bmatrix}
+$$
+
+∎

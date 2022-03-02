@@ -1,0 +1,482 @@
+# Differentiation
+
+We now get to our first computational problem: given a function, how can we approximate its derivative at a
+point? Before we begin, we must be clear what a "function" is. Consider three possible scenarios:
+
+1. _Black-box function_: Consider a floating-point valued function $f^{\rm FP} : D \rightarrow F$ where 
+$D \subset F \equiv F_{\sigma,Q,S}$
+(e.g., we are given a double precision function that takes in a `Float64` and returns another `Float64`)
+which we only know _pointwise_. This is the situation if we have a function that relies on a compiled C library,
+which composes floating point arithmetic operations.
+Since $F$ is a discrete set such an $f^{\rm FP}$ cannot be differentiable in a rigorous way,
+therefore we need to assume that $f^{\rm FP}$ approximates a differentiable function $f$ with controlled
+error in order to state anything precise.
+2. _Generic function_: Consider a function that is a formula (or, equivalentally, a _piece of code_) 
+that we can evaluate it on arbitrary types, including
+custom types that we create. An example is a polynomial:
+$
+p(x) = p_0 + p_1 x + \cdots + p_n x^n
+$
+which can be evaluated for $x$ in the reals, complexes, or any other ring.
+ More generally, if we have a function defined in Julia that does not call any
+C libraries it can be evaluated on different types. 
+For analysis we typically consider both a differentiable function $f : D \rightarrow {\mathbb R}$ for
+$D ⊂ {\mathbb R}$, 
+which would be what one would have if we could evaluate a function exactly using real arithmetic, and 
+$f^{\rm FP} : D \cap F \rightarrow F$, which is what we actually compute when evaluating the function using 
+floating point arithmetic.
+3. _Graph function_: The function is built by composing different basic "kernels" with known differentiability properties.
+We won't consider this situation in this module, though it is the model used by Python machine learning toolbox's
+like [PyTorch](https://pytorch.org) and [TensorFlow](http://tensorflow.org).
+
+We discuss the following techniques:
+
+1. Finite-differences: Use the definition of a derivative that one learns in calculus to approximate its value.
+Unfortunately, the round-off errors of floating point arithmetic typically limit its accuracy.
+2. Dual numbers (forward-mode automatic differentiation): Define a special type that when applied to a function
+computes its derivative. Mathematically, this uses _dual numbers_, which are analoguous to complex numbers.
+
+Note there are other techniques for differentiation that we don't discuss:
+
+1. Symbolic differentiation: A tree is built representing a formula which is differentiated using
+the product and chain rule.
+2. Adjoints and back-propagation (reverse-mode automatic differentiation): This is similar to
+symbolic differentiation but automated, to build up 
+a tape of operations that tracks interdependencies. 
+It's outside the scope of this module but is computationally preferred for computing gradients
+of large dimensional functions which is critical in machine learning.
+4. Interpolation and differentiation: We can also differentiate functions _globally_, that is, in an interval instead of
+only a single point, which will be discussed later in the module.
+
+```julia
+using ColorBitstring
+```
+
+
+## 1. Finite-differences
+
+The definition 
+$$
+f'(x) = \lim_{h \rightarrow 0} {f(x+h) - f(x) \over h}
+$$
+tells us that
+$$
+f'(x) \approx {f(x+h) - f(x) \over h}
+$$
+provided that $h$ is sufficiently small. 
+
+It's important to note that approximation uses only the _black-box_
+notion of a function but to obtain bounds we need more.
+
+If we know a bound on $f''(x)$ then Taylor's theorem tells us a precise bound:
+
+**Proposition**
+The error in approximating the derivative using finite differences is
+$$
+\left|f'(x) - {f(x+h) - f(x) \over h}\right| \leq {M \over 2} h
+$$
+where $M = \sup_{x \leq t \leq x+h} |f''(t)|$.
+
+**Proof**
+Follows immediately from Taylor's theorem:
+$$
+f(x+h) = f(x) + f'(x) h + {f''(t) \over 2} h^2
+$$
+for some $x ≤ t ≤ x+h$.
+
+◼️
+
+
+
+
+There are also alternative versions of finite differences. Leftside finite-differences:
+$$
+f'(x) ≈ {f(x) - f(x-h) \over h}
+$$
+and central differences:
+$$
+f'(x) ≈ {f(x + h) - f(x - h) \over 2h}
+$$
+Composing these approximations is useful for higher-order derivatives as we 
+discuss in the problem sheet.
+
+Note this is assuming _real arithmetic_, the answer is drastically
+different with _floating point arithmetic_.
+
+### Does finite-differences work with floating point arithmetic?
+
+
+
+Let's try differentiating two simple polynomials $f(x) = 1 + x + x^2$ and $g(x) = 1 + x/3 + x^2$
+by applying the finite-difference approximation to their floating point implementations
+$f^{\rm FP}$ and $g^{\rm FP}$:
+```julia
+f = x -> 1 + x + x^2     # we treat f and g as black-boxs
+g = x -> 1 + x/3 + x^2
+h = 0.000001
+(f(h)-f(0))/h, (g(h)-g(0))/h
+```
+Both seem to roughly approximate the true derivatives ($1$ and $1/3$).
+We can do a plot to see how fast the error goes down as we let $h$ become small. 
+```julia
+using Plots
+h = 2.0 .^ (0:-1:-60)  # [1,1/2,1/4,…]
+nanabs = x -> iszero(x) ? NaN : abs(x) # avoid 0's in log scale plot
+plot(nanabs.((f.(h) .- f(0)) ./ h .- 1); yscale=:log10, title="convergence of derivatives, h = 2^(-n)", label="f", legend=:bottomleft)
+plot!(abs.((g.(h) .- g(0)) ./ h .- 1/3); yscale=:log10, label = "g")
+```
+In the case of $f$ it is a success: we approximate the true derivative _exactly_ provided we take $h = 2^{-n}$
+for $26 < n \leq 52$.
+But for $g$ it is a huge failure: the approximation starts to converge, but then diverges exponentially fast, before levelling off!
+
+It is clear that $f$ is extremely special. Most functions will behave like $g$, and had we not taken
+$h$ to be a power of two we also see divergence for differentiating $f$: 
+```julia
+h = 10.0 .^ (0:-1:-16)  # [1,1/10,1/100,…]
+plot(abs.((f.(h) .- f(0)) ./ h .- 1); yscale=:log10, title="convergence of derivatives, h = 10^(-n)", label="f", legend=:bottomleft)
+plot!(abs.((g.(h) .- g(0)) ./ h .- 1/3); yscale=:log10, label = "g")
+```
+For these two simple
+examples, we can understand why we see very different behaviour.
+
+
+**Example (convergence(?) of finite difference)** Consider differentiating $f(x) = 1 + x + x^2$ at 0 with $h = 2^{-n}$.
+We consider 3 different cases with different behaviour, where $S$ is the number of significand bits: 
+
+1. $0 ≤ n ≤ S/2$
+2. $S/2 < n ≤ S$
+3. $S ≤ n$
+
+Note that $f^{\rm FP}(0) = f(0) = 1$. Thus we wish to understand the error in approximating $f'(0) = 1$ by
+$$
+(f^{\rm FP}(h) ⊖ 1) ⊘ h\qquad\hbox{where}\qquad f^{\rm FP}(x) = 1 ⊕ x ⊕ x ⊗ x.
+$$
+
+_Case 1_ ($0 ≤ n ≤ S/2$): note that $f^{\rm FP}(h) = f(h) = 1 + 2^{-n} + 2^{-2n}$
+as each computation is precisely a floating point number (hence no rounding). We can see this in half-precision,
+with $n = 3$ we have a 1 in the 3rd and 6th decimal place:
+```julia
+S = 10 # 10 significant bits
+n = 3  # 3 ≤ S/2 = 5
+h = Float16(2)^(-n)
+printbits(f(h))
+```
+Subtracting 1 and dividing by $h$ will also be exact, hence we get
+$$
+(f^{\rm FP}(h) ⊖ 1) ⊘ h = 1 + 2^{-n}
+$$
+which shows exponential convergence.
+
+_Case 2_ ($S/2 < n ≤ S$): Now we have (using round-to-nearest)
+$$
+f^{\rm FP}(h) = (1 + 2^{-n}) ⊕ 2^{-2n} = 1 + 2^{-n}
+$$
+Then
+$$
+(f^{\rm FP}(h) ⊖ 1) ⊘ h = 1 = f'(0)
+$$
+We have actually performed better than true real arithmetic and converged without a limit!
+
+_Case 3_ ($n > S$): If we take $n$ too large, then $1 ⊕ h = 1$ and we have $f^{\rm FP}(h) = 1$, that is and 
+$$
+(f^{\rm FP}(h) ⊖ 1) ⊘ h = 0 \neq f'(0)
+$$
+
+**Example (divergence of finite difference)** Consider differentiating $g(x) = 1 + x/3 + x^2$ at 0 with $h = 2^{-n}$
+and assume $n$ is even for simplicity and consider half-precision with $S = 10$.
+Note that $g^{\rm FP}(0) = g(0) = 1$.
+Recall
+$$
+h ⊘ 3 = 2^{-n-2} * (1.0101010101)_2
+$$
+Note we lose two bits each time in the computation of $1 ⊕ (h ⊘ 3)$: 
+```julia
+n = 0; h = Float16(2)^(-n); printlnbits(1 + h/3)
+n = 2; h = Float16(2)^(-n); printlnbits(1 + h/3)
+n = 4; h = Float16(2)^(-n); printlnbits(1 + h/3)
+n = 8; h = Float16(2)^(-n); printlnbits(1 + h/3)
+```
+It follows if $S/2 < n < S$ that
+$$
+1 ⊕ (h ⊘ 3) = 1 + h/3 - 2^{-10}/3
+$$
+Therefore
+$$
+(g^{\rm FP}(h) ⊖ 1) ⊘ h = 1/3 - 2^{n-10}/3
+$$
+Thus the error grows exponentially with $n$. 
+
+
+If $n ≥ S$ then $1 ⊕ (h ⊘ 3) = 1$ and we have
+$$
+(g^{\rm FP}(h) ⊖ 1) ⊘ h = 0
+$$
+
+
+### Bounding the error
+
+
+We can bound the error using the bounds on floating point arithmetic. 
+
+**Theorem (finite-difference error bound)** Let $f$ be twice-differentiable in a neighbourhood of $x$ and assume that 
+$f^{\rm FP}(x) = f(x) + δ_x^f$ has uniform absolute accuracy in that neighbourhood, that is:
+$$
+|δ_x^f| \leq c ϵ_{\rm m}
+$$
+for a fixed constant $c$. Assume for simplicity $h = 2^{-n}$ where $n \leq S$ and $|x| \leq 1$. 
+Then the finite-difference approximation satisfies
+$$
+(f^{\rm FP}(x + h) ⊖ f^{\rm FP}(x)) ⊘ h = f'(x) + δ_{x,h}^{\rm FD}
+$$
+where 
+$$
+|δ_{x,h}^{\rm FD}| \leq {|f'(x)| \over 2} ϵ_{\rm m} + M h +  {4c ϵ_{\rm m} \over h}
+$$
+for $M = \sup_{x \leq t \leq x+h} |f''(t)|$.
+
+**Proof**
+
+We have (noting by our assumptions $x ⊕ h = x + h$ and that dividing by $h$ will only change the exponent so
+is exact)
+$$
+\begin{align*}
+(f^{\rm FP}(x + h) ⊖ f^{\rm FP}(x)) ⊘ h &= {f(x + h) +  δ^f_{x+h} - f(x) - δ^f_x \over h} (1 + δ_1) \\
+&= {f(x+h) - f(x) \over h} (1 + δ_1) + {δ^f_{x+h}- δ^f_x \over h} (1 + δ_1)
+\end{align*}
+$$
+where $|δ_1| \leq {ϵ_{\rm m} / 2}$. Applying Taylor's theorem we get 
+$$
+(f^{\rm FP}(x + h) ⊖ f^{\rm FP}(x)) ⊘ h = f'(x) + \underbrace{f'(x) δ_1 + {f''(t) \over 2} h (1 + \delta_1) + {δ^f_{x+h}- δ^f_x \over h} (1 + δ_1)}_{δ_{x,h}^{\rm FD}}
+$$
+The bound then follows, using the very pessimistic bound $|1 + δ_1| \leq 2$.
+
+∎
+
+The three-terms of this bound tell us a story: the first term is a fixed (small) error, the second term tends to zero
+as $h \rightarrow 0$, while the last term grows like $ϵ_{\rm m}/h$ as $h \rightarrow 0$.  Thus we observe convergence
+while the second term dominates, until the last term takes over.
+Of course, a bad upper bound is not the same as a proof that something grows, but it is a good indication of 
+what happens _in general_ and suffices to motivate the following heuristic to balance the two sources of errors:
+
+
+**Heuristic (finite-difference with floating-point step)** Choose $h$ proportional to $\sqrt{ϵ_{\rm m}}$
+in finite-differences.
+
+In the case of double precision $\sqrt{ϵ_{\rm m}} ≈ 1.5\times 10^{-8}$, which is close to when the observed error begins to increase
+in our examples.
+
+
+
+**Remark** While finite differences is of debatable utility for computing derivatives, it is extremely effective
+in building methods for solving differential equations, as we shall see later. It is also very useful as a "sanity check"
+if one wants something to compare with for other numerical methods for differentiation.
+
+## 2. Dual numbers (Forward-mode automatic differentiation)
+
+Automatic differentiation consists of applying functions to special types that determine the derivatives.
+Here we do so via _dual numbers_.
+
+**Definition (Dual numbers)** Dual numbers ${\mathbb D}$ are a commutative ring over the reals 
+generated by $1$ and $ϵ$ such that $ϵ^2 = 0$.
+Dual numbers are typically written as $a + b ϵ$ where $a$ and $b$ are real.
+
+This is very much analoguous to complex numbers, which are a field generated by $1$ and ${\rm i}$ such that
+${\rm i}^2 = -1$. Compare multiplication of each number type:
+$$
+\begin{align*}
+(a + b {\rm i}) (c + d {\rm i}) &= ac + (bc + ad) {\rm i} + bd {\rm i}^2 = ac -bd + (bc + ad) {\rm i} \\
+(a + b ϵ) (c + d ϵ) &= ac + (bc + ad) ϵ + bd ϵ^2 = ac  + (bc + ad) ϵ 
+\end{align*}
+$$
+And just as we view ${\mathbb R} \subset {\mathbb C}$ by equating $a \in {\mathbb R}$ with $a + 0{\rm i} \in {\mathbb C}$,
+we can view ${\mathbb R} \subset {\mathbb D}$ by equating $a \in {\mathbb R}$ with $a + 0{\rm ϵ} \in {\mathbb D}$.
+
+
+
+
+### Connection with differentiation
+
+Applying a polynomial to a dual number $a + b ϵ$ tells us the derivative at $a$:
+
+**Theorem (polynomials on dual numbers)** Suppose $p$ is a polynomial. Then
+$$
+p(a + b ϵ) = p(a) + b p'(a) ϵ
+$$
+
+**Proof**
+
+It suffices to consider $p(x) = x^n$ for $n \geq 1$ as other polynomials follow from linearity. We proceed by induction:
+The case $n = 1$ is trivial. For $n > 1$ we have 
+$$
+(a + b ϵ)^n = (a + b ϵ) (a + b ϵ)^{n-1} = (a + b ϵ) (a^{n-1} + (n-1) b a^{n-2} ϵ) = a^n + b n a^{n-1} ϵ.
+$$
+
+∎
+
+We can extend real-valued differentiable functions to dual numbers in a similar manner.
+First, consider a standard function with a Taylor series (e.g. ${\rm cos}$, ${\rm sin}$, ${\rm exp}$, etc.)
+$$
+f(x) = \sum_{k=0}^∞ f_k x^k
+$$
+so that $a$ is inside the radius of convergence. This leads naturally to a definition on dual numbers:
+$$
+\begin{align*}
+f(a + b ϵ) &= \sum_{k=0}^∞ f_k (a + b ϵ)^k = \sum_{k=0}^∞ f_k (a^k + k a^{k-1} b ϵ) = \sum_{k=0}^∞ f_k a^k +  \sum_{k=0}^∞ f_k k a^{k-1} b ϵ  \\
+  &= f(a) + b f'(a) ϵ
+\end{align*}
+$$
+More generally, given a differentiable function we can extend it to dual numbers:
+
+**Definition (dual extension)** Suppose a real-valued function $f$
+is differentiable at $a$. If
+$$
+f(a + b ϵ) = f(a) + b f'(a) ϵ
+$$
+then we say that it is a _dual extension at_ $a$.
+
+Thus, for basic functions we have natural extensions:
+$$
+\begin{align*}
+\exp(a + b ϵ) &:= \exp(a) + b \exp(a) ϵ \\
+\sin(a + b ϵ) &:= \sin(a) + b \cos(a) ϵ \\
+\cos(a + b ϵ) &:= \cos(a) - b \sin(a) ϵ \\
+\log(a + b ϵ) &:= \log(a) + {b \over a} ϵ \\
+\sqrt{a+b ϵ} &:= \sqrt{a} + {b \over 2 \sqrt{a}} ϵ \\
+|a + b ϵ| &:= |a| + b\, {\rm sign} a\, ϵ
+\end{align*}
+$$
+provided the function is differentiable at $a$. Note the last example does not have
+a convergent Taylor series (at 0) but we can still extend it where it is differentiable.
+
+Going further, we can add, multiply, and compose such functions:
+
+**Lemma (product and chain rule)**
+If $f$ is a dual extension at $g(a)$ and $g$
+is a dual extension at $a$, then $q(x) := f(g(x))$ is a dual extension at $a$.
+If $f$ and $g$ are dual extensions at $a$ then 
+$r(x) := f(x) g(x)$ is also dual extensions at $a$. In other words:
+$$
+\begin{align*}
+q(a+b ϵ) &= q(a) + b q'(a) ϵ \\
+r(a+b ϵ) &= r(a) + b r'(a) ϵ
+\end{align*}
+$$
+
+**Proof**
+For $q$ it follows immediately:
+$$
+q(a + b ϵ) = f(g(a + b ϵ)) = f(g(a) + b g'(a) ϵ) = f(g(a)) + b g'(a) f'(g(a))ϵ = q(a) + b q'(a) ϵ.
+$$
+For $r$ we have
+$$
+r(a + b ϵ) = f(a+b ϵ )g(a+b ϵ )= (f(a) + b f'(a) ϵ)(g(a) + b g'(a) ϵ) = f(a)g(a) + b (f'(a)g(a) + f(a)g'(a)) ϵ = r(a) +b r'(a) ϵ.
+$$
+
+∎
+
+A simple corollary is that any function defined in terms of addition, multiplication, composition, etc.
+of functions that are dual with differentiation will be differentiable via dual numbers.
+
+**Example (differentiating non-polynomial)**
+
+Consider $f(x) =  \exp(x^2 + {\rm e}^{x})$ by evaluating on the duals:
+$$
+f(1 + ϵ) = \exp(1 + 2ϵ + {\rm e} + {\rm e} ϵ) =  \exp(1 + {\rm e}) + \exp(1 + {\rm e}) (2 + {\rm e}) ϵ
+$$
+and therefore we deduce that
+$$
+f'(1) = \exp(1 + {\rm e}) (2 + {\rm e}).
+$$
+
+
+### Implementation as a special type
+
+
+We now consider a simple implementation of dual numbers that works on general polynomials:
+```julia
+# Dual(a,b) represents a + b*ϵ
+struct Dual{T}
+    a::T
+    b::T
+end
+
+# Dual(a) represents a + 0*ϵ
+Dual(a::Real) = Dual(a, zero(a)) # for real numbers we use a + 0ϵ
+
+# Allow for a + b*ϵ syntax
+const ϵ = Dual(0, 1)
+
+import Base: +, *, -, /, ^, zero, exp
+
+# support polynomials like 1 + x, x - 1, 2x or x*2 by reducing to Dual
++(x::Real, y::Dual) = Dual(x) + y
++(x::Dual, y::Real) = x + Dual(y)
+-(x::Real, y::Dual) = Dual(x) - y
+-(x::Dual, y::Real) = x - Dual(y)
+*(x::Real, y::Dual) = Dual(x) * y
+*(x::Dual, y::Real) = x * Dual(y)
+
+# support x/2 (but not yet division of duals)
+/(x::Dual, k::Real) = Dual(x.a/k, x.b/k)
+
+# a simple recursive function to support x^2, x^3, etc.
+function ^(x::Dual, k::Integer)
+    if k < 0
+        error("Not implemented")
+    elseif k == 1
+        x
+    else
+        x^(k-1) * x
+    end
+end
+
+# Algebraic operationds for duals
+-(x::Dual) = Dual(-x.a, -x.b)
++(x::Dual, y::Dual) = Dual(x.a + y.a, x.b + y.b)
+-(x::Dual, y::Dual) = Dual(x.a - y.a, x.b - y.b)
+*(x::Dual, y::Dual) = Dual(x.a*y.a, x.a*y.b + x.b*y.a)
+
+exp(x::Dual) = Dual(exp(x.a), exp(x.a) * x.b)
+```
+
+We can also try it on the two polynomials as above:
+```julia
+f = x -> 1 + x + x^2
+g = x -> 1 + x/3 + x^2
+f(ϵ).b, g(ϵ).b
+```
+The first example exactly computes the derivative, and the
+second example is exact up to the last bit rounding!
+It also works for higher order polynomials:
+```julia
+f = x -> 1 + 1.3x + 2.1x^2 + 3.1x^3
+f(0.5 + ϵ).b - 5.725
+```
+It is indeed "accurate to (roughly) 16-digits", the best we can hope for 
+using floating point.
+
+We can use this in "algorithms" as well as simple polynomials.
+Consider the polynomial $1 + … + x^n$:
+```julia
+function s(n, x)
+    ret = 1 + x # first two terms
+    for k = 2:n
+        ret += x^k
+    end
+    ret
+end
+s(10, 0.1 + ϵ).b
+```
+This matches exactly the "true" (up to rounding) derivative:
+```julia
+sum((1:10) .* 0.1 .^(0:9))
+```
+
+Finally, we can try the more complicated example:
+```julia
+f = x -> exp(x^2 + exp(x))
+f(1 + ϵ)
+```
+
+What makes dual numbers so effective is that, unlike finite differences, they are not
+prone to disasterous growth due to round-off errors. 

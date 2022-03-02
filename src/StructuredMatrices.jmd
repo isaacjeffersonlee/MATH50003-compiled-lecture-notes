@@ -1,0 +1,613 @@
+
+## Structured Matrices
+
+We have seen how algebraic operations (`+`, `-`, `*`, `/`) are
+well-defined for floating point numbers. Now we see how this allows us
+to do (approximate) linear algebra operations on structured matrices. That is,
+we consider the following structures:
+
+
+1. _Dense_: This can be considered unstructured, where we need to store all entries in a
+vector or matrix. Matrix multiplication reduces directly to standard algebraic operations. 
+Solving linear systems with dense matrices will be discussed later.
+2. _Triangular_: If a matrix is upper or lower triangular, we can immediately invert using
+back-substitution. In practice we store a dense matrix and ignore the upper/lower entries.
+3. _Banded_: If a matrix is zero apart from entries a fixed distance from  the diagonal it is
+called banded and this allows for more efficient algorithms. We discuss diagonal, 
+tridiagonal and bidiagonal matrices.
+3. _Permutation_: A permutation matrix permutes the rows of a vector. 
+4. _Orthogonal_: An orthogonal matrix $Q$ satisfies $Q^⊤ Q = I$, in other words, they are
+very easy to invert. We discuss the special cases of simple rotations and reflections.
+
+
+```julia
+using LinearAlgebra, Plots, BenchmarkTools
+```
+
+
+### 1. Dense vectors and matrices
+
+A `Vector` of a primitive type (like `Int` or `Float64`) is stored
+consecutively in memory. E.g. if we have a `Vector{Int8}` of length
+`n` then it is stored as `8n` bits (`n` bytes) in a row.
+A  `Matrix` is stored consecutively in memory, going down column-by-
+column. That is,
+```julia
+A = [1 2;
+     3 4;
+     5 6]
+```
+Is actually stored equivalently to a length `6` vector:
+```julia
+vec(A)
+```
+This is known as _column-major_ format.
+
+**Remark** Note that transposing `A` is done lazyily and so `A'`
+stores the entries by row. That is, `A'` is stored in 
+_row-major_ format.
+
+
+Matrix-vector multiplication works as expected:
+```julia
+x = [7, 8]
+A*x
+```
+
+Note there are two ways this can be implemented: either the traditional definition,
+going row-by-row:
+$$
+\begin{bmatrix} \sum_{j=1}^n a_{1,j} x_j \\ \vdots \\ \sum_{j=1}^n a_{m,j} x_j \end{bmatrix}
+$$
+or going column-by-column:
+$$
+x_1 𝐚_1  + \cdots + x_n 𝐚_n
+$$
+It is easy to implement either version of matrix-multiplication in terms of the algebraic operations 
+we have learned, in this case just using integer arithmetic:
+```julia
+## go row-by-row
+function mul_rows(A, x)
+    m,n = size(A)
+    # promote_type type finds a type that is compatible with both types, eltype gives the type of the elements of a vector / matrix
+    c = zeros(promote_type(eltype(x),eltype(A)), m)
+    for k = 1:m, j = 1:n
+        c[k] += A[k, j] * x[j]
+    end
+    c
+end
+
+## go column-by-column
+function mul(A, x)
+    m,n = size(A)
+    # promote_type type finds a type that is compatible with both types, eltype gives the type of the elements of a vector / matrix
+    c = zeros(promote_type(eltype(x),eltype(A)), m)
+    for j = 1:n, k = 1:m
+        c[k] += A[k, j] * x[j]
+    end
+    c
+end
+
+mul_rows(A, x), mul(A, x)
+```
+
+Either implementation will be $O(mn)$ operations. However, the implementation 
+`mul` accesses the entries of `A` going down the column,
+which happens to be _significantly faster_ than `mul_rows`, due to accessing
+memory of `A` in order. We can see this by measuring the time it takes using `@btime`:
+```julia
+n = 1000
+A = randn(n,n) # create n x n matrix with random normal entries
+x = randn(n) # create length n vector with random normal entries
+
+@btime mul_rows(A,x)
+@btime mul(A,x)
+@btime A*x; # built-in, high performance implementation. USE THIS in practice
+```
+Here `ms` means milliseconds (`0.001 = 10^(-3)` seconds) and `μs` means microseconds (`0.000001 = 10^(-6)` seconds).
+So we observe that `mul` is roughly 3x faster than `mul_rows`, while the optimised `*` is roughly 5x faster than `mul`.
+
+
+**Remark (advanced)** For floating point types, `A*x` is implemented in BLAS which is generally multi-threaded
+and is not identical to `mul(A,x)`, that is, some inputs will differ in how the computations
+are rounded.
+
+
+Note that the rules of arithmetic apply here: matrix multiplication with floats
+will incur round-off error (the precise details of which are subject to the implementation):
+
+```julia
+A = [1.4 0.4;
+     2.0 1/2]
+A * [1, -1] # First entry has round-off error, but 2nd entry is exact
+```
+And integer arithmetic will be prone to overflow:
+```julia
+A = fill(Int8(2^6), 2, 2) # make a matrix whose entries are all equal to 2^6
+A * Int8[1,1] # we have overflowed and get a negative number -2^7
+```
+
+
+Solving a linear system is done using `\`:
+```julia
+A = [1 2 3;
+     1 2 4;
+     3 7 8]
+b = [10; 11; 12]
+A \ b
+```
+Despite the answer being integer-valued, 
+here we see that it resorted to using floating point arithmetic,
+incurring rounding error. 
+But it is "accurate to (roughly) 16-digits".
+As we shall see, the way solving a linear system works is we first write `A` as a
+product of simpler matrices, e.g., a product of triangular matrices.
+
+**Remark (advanced)** For floating point types, `A \ x` is implemented in LAPACK, which
+like BLAS is generally multi-threaded and in fact different machines may round differently.
+
+
+### 2. Triangular matrices
+
+Triangular matrices are represented by dense square matrices where the entries below the
+diagonal
+are ignored:
+```julia
+A = [1 2 3;
+     4 5 6;
+     7 8 9]
+U = UpperTriangular(A)
+```
+We can see that `U` is storing all the entries of `A`:
+```julia
+U.data
+```
+Similarly we can create a lower triangular matrix by ignoring the entries above the diagonal:
+```julia
+L = LowerTriangular(A)
+```
+
+If we know a matrix is triangular we can do matrix-vector multiplication in roughly half
+the number of operations. 
+Moreover, we can easily invert matrices. 
+Consider a simple 3×3 example, which can be solved with `\`:
+```julia
+b = [5,6,7]
+x = U \ b
+```
+Behind the seens, `\` is doing back-substitution: considering the last row, we have all
+zeros apart from the last column so we know that `x[3]` must be equal to:
+```julia
+b[3] / U[3,3]
+```
+Once we know `x[3]`, the second row states `U[2,2]*x[2] + U[2,3]*x[3] == b[2]`, rearranging
+we get that `x[2]` must be:
+```julia
+(b[2] - U[2,3]*x[3])/U[2,2]
+```
+Finally, the first row states `U[1,1]*x[1] + U[1,2]*x[2] + U[1,3]*x[3] == b[1]` i.e.
+`x[1]` is equal to
+```julia
+(b[1] - U[1,2]*x[2] - U[1,3]*x[3])/U[1,1]
+```
+
+More generally, we can solve the upper-triangular system
+$$
+\begin{bmatrix}
+u_{11} & \cdots & u_{1n} \\ & \ddots & \vdots \\ && u_{nn}
+\end{bmatrix} \begin{bmatrix} x_1 \\ \vdots \\ x_n \end{bmatrix} = 
+\begin{bmatrix} b_1 \\ \vdots \\ b_n \end{bmatrix}
+$$
+by computing $x_n, x_{n-1}, \ldots, x_1$ by the back-substitution formula:
+$$
+x_k = {b_k - \sum_{j=k+1}^n u_{kj} x_j \over u_{kk}}
+$$
+
+
+
+The problem sheet will explore implementing this method, as well
+as forward substitution for inverting lower triangular matrices. The cost of multiplying and solving linear systems with a
+triangular matrix is $O(n^2)$.
+
+
+### 3. Banded matrices
+
+A _banded matrix_ is zero off a prescribed number of diagonals. 
+We call the number of (potentially) non-zero diagonals the _bandwidths_:
+
+
+**Definition (bandwidths)** A matrix $A$ has _lower-bandwidth_ $l$ if 
+$A[k,j] = 0$ for all $k-j > l$ and _upper-bandwidth_ $u$ if
+$A[k,j] = 0$ for all $j-k > u$. We say that it has _strictly lower-bandwidth_ $l$
+if it has lower-bandwidth $l$ and there exists a $j$ such that $A[j+l,j] \neq 0$.
+We say that it has _strictly upper-bandwidth_ $u$
+if it has upper-bandwidth $u$ and there exists a $k$ such that $A[k,k+u] \neq 0$.
+
+
+#### Diagonal
+
+**Definition (Diagonal)** _Diagonal matrices_ are square matrices with bandwidths $l = u = 0$.
+
+
+Diagonal matrices in Julia are stored as a vector containing the diagonal entries:
+```julia
+x = [1,2,3]
+D = Diagonal(x)
+```
+It is clear that we can perform diagonal-vector multiplications and solve linear systems involving diagonal matrices efficiently
+(in $O(n)$ operations).
+
+#### Bidiagonal
+
+**Definition (Bidiagonal)** If a square matrix has bandwidths $(l,u) = (1,0)$ it is _lower-bidiagonal_ and
+if it has bandwidths $(l,u) = (0,1)$ it is _upper-bidiagonal_. 
+
+We can create Bidiagonal matrices in Julia by specifying the diagonal and off-diagonal:
+
+```julia
+Bidiagonal([1,2,3], [4,5], :L)
+```
+```julia
+Bidiagonal([1,2,3], [4,5], :U)
+```
+
+Multiplication and solving linear systems with Bidiagonal systems is also $O(n)$ operations, using the standard
+multiplications/back-substitution algorithms but being careful in the loops to only access the non-zero entries. 
+
+
+#### Tridiagonal
+
+**Definition (Tridiagonal)** If a square matrix has bandwidths $l = u = 1$ it is _tridiagonal_.
+
+Julia has a type `Tridiagonal` for representing a tridiagonal matrix from its sub-diagonal, diagonal, and super-diagonal:
+```julia
+Tridiagonal([1,2], [3,4,5], [6,7])
+```
+Tridiagonal matrices will come up in second-order differential equations and orthogonal polynomials.
+We will later see how linear systems involving tridiagonal matrices can be solved in $O(n)$ operations.
+
+### 4. Permutation Matrices
+
+Permutation matrices are matrices that represent the action of permuting the entries of a vector,
+that is, matrix representations of the symmetric group $S_n$, acting on $ℝ^n$.
+Recall every $σ \in S_n$ is a bijection between $\{1,2,\ldots,n\}$ and itself.
+We can write a permutation $σ$ in _Cauchy notation_:
+$$
+\begin{pmatrix}
+ 1 & 2 & 3 & \cdots & n \cr
+ σ_1 & σ_2 & σ_3 & \cdots & σ_n
+ \end{pmatrix}
+$$
+where $\{σ_1,\ldots,σ_n\} = \{1,2,\ldots,n\}$ (that is, each integer appears precisely once).
+We denote the _inverse permutation_ by $σ^{-1}$, which can be constructed by swapping the rows of
+the Cauchy notation and reordering.
+
+We can encode a permutation in vector $\mathbf σ = [σ_1,\ldots,σ_n]^⊤$. 
+This induces an action on a vector (using indexing notation)
+$$
+𝐯[\mathbf σ] = \begin{bmatrix}v_{σ_1}\\ \vdots \\ v_{σ_n} \end{bmatrix}
+$$
+
+
+**Example (permutation of a vector)** 
+Consider the permutation $σ$ given by
+$$
+\begin{pmatrix}
+ 1 & 2 & 3 & 4 & 5 \cr
+ 1 & 4 & 2 & 5 & 3
+ \end{pmatrix}
+$$
+We can apply it to a vector:
+```julia
+σ = [1, 4, 2, 5, 3]
+v = [6, 7, 8, 9, 10]
+v[σ] # we permutate entries of v
+```
+Its inverse permutation $σ^{-1}$ has Cauchy notation coming from swapping the rows of
+the Cauchy notation of $σ$ and sorting:
+$$
+\begin{pmatrix}
+ 1 & 4 & 2 & 5 & 3 \cr
+ 1 & 2 & 3 & 4 & 5
+ \end{pmatrix} \rightarrow \begin{pmatrix}
+ 1 & 2 & 4 & 3 & 5 \cr
+ 1 & 3 & 2 & 5 & 4
+ \end{pmatrix} 
+$$
+Julia has the function `invperm` for computing the vector that encodes
+the inverse permutation:
+And indeed:
+```julia
+σ⁻¹ = invperm(σ) # note that ⁻¹ are just unicode characters in the variable name
+```
+And indeed permuting the entries by `σ` and then by `σ⁻¹` returns us
+to our original vector:
+```julia
+v[σ][σ⁻¹] # permuting by σ and then σⁱ gets us back
+```
+
+
+
+Note that the operator
+$$
+P_σ(𝐯) = 𝐯[\mathbf σ]
+$$
+is linear in $𝐯$, therefore, we can identify it with a matrix whose action is:
+$$
+P_σ \begin{bmatrix} v_1\\ \vdots \\ v_n \end{bmatrix} = \begin{bmatrix}v_{σ_1} \\ \vdots \\ v_{σ_n}  \end{bmatrix}.
+$$
+The entries of this matrix are
+$$
+P_σ[k,j] = 𝐞_k^⊤ P_σ 𝐞_j = 𝐞_k^⊤ 𝐞_{σ^{-1}_j} = δ_{k,σ^{-1}_j} = δ_{σ_k,j}
+$$
+where $δ_{k,j}$ is the _Kronecker delta_:
+$$
+δ_{k,j} := \begin{cases} 1 & k = j \\
+                        0 & \hbox{otherwise}
+                        \end{cases}.
+$$
+
+
+This construction motivates the following definition:
+
+**Definition (permutation matrix)** $P \in ℝ^{n × n}$ is a permutation matrix if it is equal to
+the identity matrix with its rows permuted.
+
+**Example (5×5 permutation matrix)**
+We can construct the permutation representation for $σ$ as above as follows:
+```julia
+P = I(5)[σ,:]
+```
+And indeed, we see its action is as expected:
+```julia
+P * v
+```
+
+**Remark (advanced)** Note that `P` is a special type `SparseMatrixCSC`. This is used
+to represent a matrix by storing only the non-zero entries as well as their location.
+This is an important data type in high-performance scientific computing, but we will not
+be using general sparse matrices in this module.
+
+**Proposition (permutation matrix inverse)** 
+Let $P_σ$ be a permutation matrix corresponding to the permutation $σ$. Then
+$$
+P_σ^⊤ = P_{σ^{-1}} = P_σ^{-1}
+$$
+That is, $P_σ$ is _orthogonal_:
+$$
+P_σ^⊤ P_σ = P_σ P_σ^⊤ = I.
+$$
+
+**Proof**
+
+We prove orthogonality via:
+$$
+𝐞_k^⊤ P_σ^⊤ P_σ 𝐞_j = (P_σ 𝐞_k)^⊤ P_σ 𝐞_j = 𝐞_{σ^{-1}_k}^⊤ 𝐞_{σ^{-1}_j} = δ_{k,j}
+$$
+This shows $P_σ^⊤ P_σ = I$ and hence $P_σ^{-1} = P_σ^⊤$. 
+
+∎
+
+
+Permutation matrices are examples of sparse matrices that can be very easily inverted. 
+
+
+
+### 4. Orthogonal matrices
+
+
+**Definition (orthogonal matrix)** A square matrix is _orthogonal_ if its inverse is its transpose:
+$$
+Q^⊤ Q = QQ^⊤ = I.
+$$
+
+We have already seen an example of an orthogonal matrices (permutation matrices). 
+Here we discuss two important special cases: simple rotations and reflections.
+
+#### Simple rotations
+
+
+**Definition (simple rotation)**
+A 2×2 _rotation matrix_ through angle $θ$ is
+$$
+Q_θ := \begin{bmatrix} \cos \theta & -\sin \theta \cr \sin \theta & \cos \theta \end{bmatrix}
+$$
+
+In what follows we use the following for writing the angle of a vector:
+
+**Definition (two-arg arctan)** The two-argument arctan function gives the angle `θ` through the point
+$[a,b]^\top$, i.e., 
+$$
+\sqrt{a^2 + b^2} \begin{bmatrix} \cos θ \\ \sin θ \end{bmatrix} =  \begin{bmatrix} a \\ b \end{bmatrix}
+$$
+It can be defined in terms of the standard arctan as follows:
+$$
+{\rm atan}(b,a) := \begin{cases} {\rm atan}{b \over a} & a > 0 \\
+                            {\rm atan}{b \over a} + π & a < 0\hbox{ and }b >0 \\
+                            {\rm atan}{b \over a} + π & a < 0\hbox{ and }b < 0 \\
+                            π/2 & a = 0\hbox{ and }b >0 \\
+                            -π/2 & a = 0\hbox{ and }b < 0 
+                            \end{cases}
+$$ 
+
+This is available in Julia:
+```julia
+atan(-1,-2) # angle through [-2,-1]
+```
+
+
+We can rotate an arbitrary vector to the unit axis. Interestingly it only requires
+basic algebraic functions (no trigonometric functions):
+
+
+
+**Proposition (rotation of a vector)** 
+The matrix
+$$Q = {1 \over \sqrt{a^2 + b^2}}\begin{bmatrix}
+ a & b \cr -b & a
+\end{bmatrix}
+$$
+is a rotation matrix satisfying
+$$
+Q \begin{bmatrix} a \\ b \end{bmatrix} = \sqrt{a^2 + b^2} \begin{bmatrix} 1 \\ 0 \end{bmatrix}
+$$
+
+**Proof** 
+
+The last equation is trivial so the only question is that it is a rotation matrix.
+Define $θ = -{\rm atan}(b, a)$. By definition of the two-arg arctan we have
+$$
+\begin{bmatrix}
+\cos θ & -\sin θ \\
+\sin θ &\cos θ
+\end{bmatrix} = \begin{bmatrix}
+\cos(-θ) & \sin(-θ) \\
+-\sin(-θ) & \cos(-θ)
+\end{bmatrix} = {1\over \sqrt{a^2 + b^2}} \begin{bmatrix} a  & b \\ -b &a \end{bmatrix}.
+$$
+
+∎
+
+
+
+
+#### Reflections
+
+In addition to rotations, another type of orthognal matrix are reflections:
+
+**Definition (reflection matrix)** 
+Given a vector $𝐯$ satisfying $\|𝐯\|=1$, the reflection matrix is the orthogonal matrix
+$$
+Q_𝐯 \triangleq I - 2 𝐯 𝐯^⊤
+$$
+
+These are reflections in the direction of $𝐯$. We can show this as follows:
+
+**Proposition** $Q_𝐯$ satisfies:
+1. Symmetry: $Q_𝐯 = Q_𝐯^⊤$
+2. Orthogonality: $Q_𝐯^⊤ Q_𝐯 = I$
+2. $𝐯$ is an eigenvector of $Q_𝐯$ with eigenvalue $-1$
+4. $Q_𝐯$ is a rank-1 perturbation of $I$
+3. $\det Q_𝐯 = -1$
+
+
+**Proof**
+
+Property 1 follows immediately. Property 2 follows from
+$$
+Q_𝐯^⊤ Q_𝐯 = Q_𝐯^2 = I - 4 𝐯 𝐯^⊤ + 4 𝐯 𝐯^⊤ 𝐯 𝐯^⊤ = I
+$$
+Property 3 follows since
+$$
+Q_𝐯 𝐯 = -𝐯
+$$
+Property 4 follows since $𝐯 𝐯^⊤$ is a rank-1 matrix as all rows are linear combinations of each other.
+To see property 5, note there is a dimension $n-1$ space $W$ orthogonal to $𝐯$, that is, for all
+$𝐰 \in W$ we have $𝐰^⊤ 𝐯 = 0$, which implies that
+$$
+Q_𝐯 𝐰 = 𝐰
+$$
+In other words, $1$ is an eigenvalue with multiplicity $n-1$ and $-1$ is an eigenvalue with multiplicity 1,
+and thus the product of the eigenvalues is $-1$.
+
+∎
+
+
+
+**Example (reflection through 2-vector)** Consider reflection through $𝐱 = [1,2]^\top$. 
+We first need to normalise $𝐱$:
+$$
+𝐯 = {𝐱 \over \|𝐱\|} = \begin{bmatrix} {1 \over \sqrt{5}} \\ {2 \over \sqrt{5}} \end{bmatrix}
+$$
+Note this indeed has unit norm:
+$$
+\|𝐯\|^2 = {1 \over 5} + {4 \over 5} = 1.
+$$
+Thus the reflection matrix is:
+$$
+Q_𝐯 = I - 2 𝐯 𝐯^⊤ = \begin{bmatrix}1 \\ & 1 \end{bmatrix} - {2 \over 5} \begin{bmatrix} 1 & 2 \\ 2 & 4 \end{bmatrix}
+ =  {1 \over 5} \begin{bmatrix} 3 & -4 \\ -4 & -3 \end{bmatrix}
+$$
+Indeed it is symmetric, and orthogonal. It sends $𝐱$ to $-𝐱$:
+$$
+Q_𝐯 𝐱 = {1 \over 5} \begin{bmatrix}3 - 8 \\ -4 - 6 \end{bmatrix} = -𝐱
+$$
+Any vector orthogonal to $𝐱$, like $𝐲 = [-2,1]^\top$, is left fixed:
+$$
+Q_𝐯 𝐲 = {1 \over 5} \begin{bmatrix}-6 -4 \\ 8 - 3 \end{bmatrix} = 𝐲
+$$
+
+
+Note that _building_ the matrix $Q_𝐯$ will be expensive ($O(n^2)$ operations), but we can apply
+$Q_𝐯$ to a vector in $O(n)$ operations using the expression:
+$$
+Q_𝐯 𝐱 = 𝐱 - 2 𝐯 (𝐯^⊤ 𝐱).
+$$
+
+
+Just as rotations can be used to rotate vectors to be aligned with coordinate axis, so can reflections,
+but in this case it works for vectors in $ℝ^n$, not just $ℝ^2$:
+
+**Definition (Householder reflection)** For a given vector
+$𝐱$, define the Householder reflection
+$$
+Q_𝐱^{±,\rm H} := Q_𝐰
+$$
+for $𝐲 = ∓ \|𝐱\| 𝐞_1 + 𝐱$ and $𝐰 = {𝐲 \over \|𝐲\|}$.
+The default choice in sign is:
+$$
+Q_𝐱^{\rm H} := Q_𝐱^{-\hbox{sign}(x_1),\rm H}.
+$$
+
+**Lemma (Householder reflection)**
+$$
+Q_𝐱^{±,\rm H} 𝐱 = ±\|𝐱\| 𝐞_1
+$$
+
+**Proof**
+Note that
+$$
+\begin{align*}
+\| 𝐲 \|^2 &= 2\|𝐱\|^2 ∓ 2 \|𝐱\| x_1, \\
+𝐲^⊤ 𝐱 &= \|𝐱\|^2 ∓  \|𝐱\| x_1
+\end{align*}
+$$
+where $x_1 = 𝐞_1^\top 𝐱$. Therefore:
+$$
+Q_𝐱^{±,\rm H} 𝐱  =  (I - 2 𝐰 𝐰^⊤) 𝐱 = 𝐱 - 2 {𝐲  \|𝐱\|  \over \|𝐲\|^2} (\|𝐱\|∓x_1) = 𝐱 - 𝐲 =  ±\|𝐱\| 𝐞_1.
+$$
+
+∎
+
+Why do we choose the the opposite sign of $x_1$ for the default reflection? For stability.
+We demonstrate the reason for this by numerical example. Consider $𝐱 = [1,h]$, i.e., a small perturbation
+from $𝐞_1$. If we reflect to $\hbox{norm}(𝐱)𝐞_1$ we see a numerical problem:
+```julia
+h = 10.0^(-10)
+x = [1,h]
+y = -norm(x)*[1,0] + x
+w = y/norm(y)
+Q = I-2w*w'
+Q*x
+```
+It didn't work! Even worse is if `h = 0`:
+```julia
+h = 0
+x = [1,h]
+y = -norm(x)*[1,0] + x
+w = y/norm(y)
+Q = I-2w*w'
+Q*x
+```
+This is because `y` has large relative error due to cancellation
+from floating point errors in computing the first entry `x[1] - norm(x)`. 
+(Or has norm zero if `h=0`.)
+We avoid this cancellation by using the default choice:
+```julia
+h = 10.0^(-10)
+x = [1,h]
+y = sign(x[1])*norm(x)*[1,0] + x
+w = y/norm(y)
+Q = I-2w*w'
+Q*x
+```
