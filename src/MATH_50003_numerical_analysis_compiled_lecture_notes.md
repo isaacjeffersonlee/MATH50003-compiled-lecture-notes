@@ -20,37 +20,37 @@ how they can be used to describe computational cost.
 Big-O, little-o, and "asymptotic to" are used to describe behaviour of functions
 at infinity. 
 
-**Definition (Big-O)** 
-$$
-f(n) = O(ϕ(n)) \qquad \hbox{(as $n → ∞$)}
-$$
-means
-$$
-\left|{f(n) \over ϕ(n)}\right|
-$$
-is bounded for sufficiently large $n$. That is,
-there exist constants $C$ and $N_0$ such 
-that, for all $n \geq N_0$, $|{f(n) \over ϕ(n)}| \leq C$.
+>**Definition (Big-O)** 
+>$$
+>f(n) = O(ϕ(n)) \qquad \hbox{(as $n → ∞$)}
+>$$
+>means
+>$$
+>\left|{f(n) \over ϕ(n)}\right|
+>$$
+>is bounded for sufficiently large $n$. That is,
+>there exist constants $C$ and $N_0$ such 
+>that, for all $n \geq N_0$, $|{f(n) \over ϕ(n)}| \leq C$.
 
-**Definition (little-O)** 
-$$
-f(n) = o(ϕ(n)) \qquad \hbox{(as $n → ∞$)}
-$$
-means
-$$
-\lim_{n → ∞} {f(n) \over ϕ(n)} = 0.
-$$
+>**Definition (little-O)** 
+>$$
+>f(n) = o(ϕ(n)) \qquad \hbox{(as $n → ∞$)}
+>$$
+>means
+>$$
+>\lim_{n → ∞} {f(n) \over ϕ(n)} = 0.
+>$$
 
-**Definition (asymptotic to)** 
-$$
-f(n) ∼ ϕ(n) \qquad \hbox{(as $n → ∞$)}
-$$
-means
-$$
-\lim_{n → ∞} {f(n) \over ϕ(n)} = 1.
-$$
+>**Definition (asymptotic to)** 
+>$$
+>f(n) ∼ ϕ(n) \qquad \hbox{(as $n → ∞$)}
+>$$
+>means
+>$$
+>\lim_{n → ∞} {f(n) \over ϕ(n)} = 1.
+>$$
 
-**Examples**
+**<span style="color:#008080">Example</span> (integer in binary)**
 $$
 {\cos n \over n^2 -1} = O(n^{-2})
 $$
@@ -75,57 +75,56 @@ $$
 $$
 
 
-Note we sometimes write $f(O(ϕ(n)))$ for a function of the form
-$f(g(n))$ such that $g(n) = O(ϕ(n))$.
+Note we sometimes write $f(O(ϕ(n)))$ for a function of the form $f(g(n))$ such that $g(n) = O(ϕ(n))$.
 
 #### Rules
 
 We have some simple algebraic rules:
 
-**Proposition (Big-O rules)**
-$$
-\begin{align*}
-O(ϕ(n))O(ψ(n)) = O(ϕ(n)ψ(n))  \qquad \hbox{(as $n → ∞$)} \\
-O(ϕ(n)) + O(ψ(n)) = O(|ϕ(n)| + |ψ(n)|)  \qquad \hbox{(as $n → ∞$)}.
-\end{align*}
-$$
+>**Proposition (Big-O rules)**
+>$$
+>\begin{align*}
+>O(ϕ(n))O(ψ(n)) = O(ϕ(n)ψ(n))  \qquad \hbox{(as $n → ∞$)} \\
+>O(ϕ(n)) + O(ψ(n)) = O(|ϕ(n)| + |ψ(n)|)  \qquad \hbox{(as $n → ∞$)}.
+>\end{align*}
+>$$
 
 
 ### 2. Asymptotics as $x → x_0$
 
 We also have Big-O, little-o and "asymptotic to" at a point:
 
-**Definition (Big-O)** 
-$$
-f(x) = O(ϕ(x)) \qquad \hbox{(as $x → x_0$)}
-$$
-means
-$$
-|f(x) \over ϕ(x)|
-$$
-is bounded in a neighbourhood of $x_0$. That is,
-there exist constants $C$ and $r$ such 
-that, for all $0 \leq |x - x_0| \leq r$, $|{f(x) \over ϕ(x)}| \leq C$.
+>**Definition (Big-O)** 
+>$$
+>f(x) = O(ϕ(x)) \qquad \hbox{(as $x → x_0$)}
+>$$
+>means
+>$$
+>|f(x) \over ϕ(x)|
+>$$
+>is bounded in a neighbourhood of $x_0$. That is,
+>there exist constants $C$ and $r$ such 
+>that, for all $0 \leq |x - x_0| \leq r$, $|{f(x) \over ϕ(x)}| \leq C$.
 
-**Definition (little-O)** 
-$$
-f(x) = o(ϕ(x)) \qquad \hbox{(as $x → x_0$)}
-$$
-means
-$$
-\lim_{x → x_0} {f(x) \over ϕ(x)} = 0.
-$$
+>**Definition (little-O)** 
+>$$
+>f(x) = o(ϕ(x)) \qquad \hbox{(as $x → x_0$)}
+>$$
+>means
+>$$
+>\lim_{x → x_0} {f(x) \over ϕ(x)} = 0.
+>$$
 
-**Definition (asymptotic to)** 
-$$
-f(x) ∼ ϕ(x) \qquad \hbox{(as $x → x_0$)}
-$$
-means
-$$
-\lim_{x → x_0} {f(x) \over ϕ(x)} = 1.
-$$
+>**Definition (asymptotic to)** 
+>$$
+>f(x) ∼ ϕ(x) \qquad \hbox{(as $x → x_0$)}
+>$$
+>means
+>$$
+>\lim_{x → x_0} {f(x) \over ϕ(x)} = 1.
+>$$
 
-**Example**
+**<span style="color:#008080">Example</span> (integer in binary)**
 $$
 \exp x = 1 + x + O(x^2) \qquad \hbox{as $x → 0$}
 $$
@@ -666,7 +665,7 @@ In Julia, the rounding mode is specified by tags `RoundUp`, `RoundDown`, and
 
 
 
-**WARNING (rounding performance, advanced)** These rounding modes are part
+**<span style="color: red">WARNING</span>** **(rounding performance, advanced)** These rounding modes are part
 of the FPU instruction set so will be (roughly) equally fast as the default, `RoundNearest`.
 Unfortunately, changing the rounding mode is expensive, and is not thread-safe.
 
@@ -695,7 +694,7 @@ setrounding(Float32, RoundUp) do
 end
 ```
 
-**WARNING (compiled constants, advanced)**: Why did we first create a variable `x` instead of typing `1f0/3`?
+**<span style="color: red">WARNING</span>** **(compiled constants, advanced)**: Why did we first create a variable `x` instead of typing `1f0/3`?
 This is due to a very subtle issue where the compiler is _too clever for it's own good_: 
 it recognises `1f0/3` can be computed at compile time, but failed to recognise the rounding mode
 was changed. 
@@ -723,8 +722,7 @@ This is because ${\rm fl}(1.1) \neq 1+1/10$, but rather:
 $$
 {\rm fl}(1.1) = 1 + 2^{-4}+2^{-5} + 2^{-8}+2^{-9}+\cdots + 2^{-48}+2^{-49} + 2^{-51}
 $$
-
-**WARNING (non-associative)** These operations are not associative! E.g. $(x \oplus y) \oplus z$ is not necessarily equal to $x \oplus (y \oplus z)$. 
+**<span style="color: red">WARNING</span>** **(non-associative)** **(non-associative)** These operations are not associative! E.g. $(x \oplus y) \oplus z$ is not necessarily equal to $x \oplus (y \oplus z)$. 
 Commutativity is preserved, at least.
 Here is a surprising example of non-associativity:
 ```julia
@@ -848,8 +846,7 @@ $$
 where $|\delta| < cϵ_{\rm m}$ for a reasonably small $c > 0$,
 _provided_ that $x \in {\rm F}^{\rm normal}$.
 Note these special functions are written in (advanced) Julia code, for example, [sin](https://github.com/JuliaLang/julia/blob/d08b05df6f01cf4ec6e4c28ad94cedda76cc62e8/base/special/trig.jl#L76).
-
-**WARNING (sin(fl(x)) is not always close to sin(x))** This is possibly a misleading statement
+**<span style="color: red">WARNING</span>** **(sin(fl(x)) is not always close to sin(x))** This is possibly a misleading statement
 when one thinks of $x$ as a real number. Consider $x = \pi$ so that $\sin x = 0$.
 However, as ${\rm fl}(\pi) \neq \pi$. Thus we only have relative accuracy compared
 to the floating point approximation:
@@ -1194,7 +1191,7 @@ $$
 $$
 The bound then follows, using the very pessimistic bound $|1 + δ_1| \leq 2$.
 
-∎
+
 
 The three-terms of this bound tell us a story: the first term is a fixed (small) error, the second term tends to zero
 as $h \rightarrow 0$, while the last term grows like $ϵ_{\rm m}/h$ as $h \rightarrow 0$.  Thus we observe convergence
@@ -1255,7 +1252,7 @@ $$
 (a + b ϵ)^n = (a + b ϵ) (a + b ϵ)^{n-1} = (a + b ϵ) (a^{n-1} + (n-1) b a^{n-2} ϵ) = a^n + b n a^{n-1} ϵ.
 $$
 
-∎
+
 
 We can extend real-valued differentiable functions to dual numbers in a similar manner.
 First, consider a standard function with a Taylor series (e.g. ${\rm cos}$, ${\rm sin}$, ${\rm exp}$, etc.)
@@ -1317,7 +1314,7 @@ r(a + b ϵ) = f(a+b ϵ )g(a+b ϵ )= (f(a) + b f'(a) ϵ)(g(a) + b g'(a) ϵ)  \\
 = f(a)g(a) + b (f'(a)g(a) + f(a)g'(a)) ϵ = r(a) +b r'(a) ϵ.
 $$
 
-∎
+
 
 A simple corollary is that any function defined in terms of addition, multiplication, composition, etc.
 of functions that are dual with differentiation will be differentiable via dual numbers.
@@ -1818,7 +1815,7 @@ $$
 $$
 This shows $P_σ^⊤ P_σ = I$ and hence $P_σ^{-1} = P_σ^⊤$. 
 
-∎
+
 
 
 Permutation matrices are examples of sparse matrices that can be very easily inverted. 
@@ -1899,7 +1896,7 @@ $$
 \end{bmatrix} = {1\over \sqrt{a^2 + b^2}} \begin{bmatrix} a  & b \\ -b &a \end{bmatrix}.
 $$
 
-∎
+
 
 
 
@@ -1943,7 +1940,7 @@ $$
 In other words, $1$ is an eigenvalue with multiplicity $n-1$ and $-1$ is an eigenvalue with multiplicity 1,
 and thus the product of the eigenvalues is $-1$.
 
-∎
+
 
 
 
@@ -2010,7 +2007,7 @@ $$
 Q_𝐱^{±,\rm H} 𝐱  =  (I - 2 𝐰 𝐰^⊤) 𝐱 = 𝐱 - 2 {𝐲  \|𝐱\|  \over \|𝐲\|^2} (\|𝐱\|∓x_1) = 𝐱 - 𝐲 =  ±\|𝐱\| 𝐞_1.
 $$
 
-∎
+
 
 Why do we choose the the opposite sign of $x_1$ for the default reflection? For stability.
 We demonstrate the reason for this by numerical example. Consider $𝐱 = [1,h]$, i.e., a small perturbation
@@ -2572,7 +2569,7 @@ P_σ L_j = P_σ + \begin{bmatrix} 𝟎_j \\ P_τ 𝐥_j \end{bmatrix} 𝐞_j^⊤
 \underbrace{(I +  \begin{bmatrix} 𝟎_j \\ P_τ 𝐥_j \end{bmatrix} 𝐞_j^⊤)}_{\tilde L_j} P_σ
 $$
 noting that $𝐞_j^⊤ P_σ = 𝐞_j^⊤$ (as $σ_j = j$). 
-∎
+
 
 
 #### LU Decomposition
@@ -2814,11 +2811,9 @@ A = [1 1 1;
      1 4 9]
 L,U,σ = lu(A) # σ is a vector encoding the permutation
 ```
-The permutation is
-```julia
-σ
-```
+The permutation is $\sigma$.
 Thus to invert a system we can do:
+
 ```julia
 b = randn(3)
 U\(L\b[σ]) == A\b
@@ -2894,7 +2889,7 @@ $$
 L= L_1 \begin{bmatrix}1 \\ & \tilde L \end{bmatrix}.
 $$
 satisfies $A = L L^⊤$.
-∎
+
 
 
 Note hidden in this proof is a simple algorithm form computing the Cholesky decomposition.
@@ -3109,7 +3104,7 @@ $$
 $$
 
 
-∎
+
 
 
  In Julia, one can use the inbuilt `norm` function to calculate norms:
@@ -3184,7 +3179,7 @@ $$
 
 
 
-∎
+
 
 We have some simple examples of induced norms:
 
@@ -3260,7 +3255,7 @@ $$
 0 = 𝐱^T A^⊤ A 𝐱 = \| A 𝐱 \|^2
 $$
 which means $A 𝐱 = 0$ and $𝐱 ∈ \hbox{ker}(A)$.
-∎
+
 
 >**Proposition (Gram matrix diagonalisation)** The Gram-matrix
 >satisfies
@@ -3277,7 +3272,7 @@ $$
 λ_k = λ_k 𝐪_k^⊤ 𝐪_k = 𝐪_k^⊤ A^⊤ A 𝐪_k = \| A 𝐪_k \|^2 ≥ 0.
 $$
 
-∎
+
 
 
 This connection allows us to prove existence:
@@ -3317,7 +3312,7 @@ U Σ V^⊤ = A V V^⊤ = A \underbrace{\begin{bmatrix} V | K \end{bmatrix}}_Q\un
 $$
 where we use the fact that $A K = 0$ so that concatenating $K$ does not change the value.
 
-∎
+
 
 Singular values tell us the 2-norm:
 
@@ -3357,7 +3352,7 @@ n & n-1 & ⋯ & 1
 $$
 
 
-∎
+
 
 We will not discuss in this module computation of singular value decompositions or eigenvalues:
 they involve iterative algorithms (actually built on a sequence of QR decompositions).
@@ -3399,7 +3394,7 @@ i.e., $\|A 𝐮\|_2 ≥ σ_{k+1} \|c\|$.  Thus $𝐰$ cannot be in this span.
 
 
 The dimension of the span of $\ker(B)$ is at least $n-k$, but the dimension of ${\rm span}(𝐯_1,…,𝐯_{k+1})$ is at least $k+1$.
-Since these two spaces cannot intersect we have a contradiction, since $(n-r) + (r+1) = n+1 > n$.  ∎
+Since these two spaces cannot intersect we have a contradiction, since $(n-r) + (r+1) = n+1 > n$.  
 
 
 
@@ -3508,7 +3503,7 @@ $$
 \| δ𝐱 \| ≤ {n ϵ_{\rm m} \over 2-nϵ_{\rm m}} \| 𝐱 \|
 $$
 
-∎
+
 
 >**Theorem (matrix-vector backward error)**
 >For $A ∈ ℝ^{m × n}$ and $𝐱 ∈ ℝ^n$ we have
@@ -3551,7 +3546,7 @@ $$
 \end{align*}
 $$
 
-∎
+
 
 So now we get to a mathematical question independent of floating point: 
 can we bound the _relative error_ in approximating
@@ -3589,7 +3584,7 @@ $$
 {\| δA 𝐱 \| \over \| A 𝐱 \| } ≤ \| δA\| \|A^{-1}\| ≤ κ(A) {\|δA\| \over \|A \|}
 $$
 
-∎
+
 
 
 Thus for floating point arithmetic we know the error is bounded by $κ(A) {n ϵ_{\rm m} \over 2-nϵ_{\rm m}}$.
@@ -3601,7 +3596,7 @@ in that case well-conditioning is not a guarantee (but it still usually works).
 --------------------------------------------------------
 
 ## Week 6: Differential Equations via Finite Differences
-><span style="color:red">YouTube</span> Lectures:
+>**YouTube Lectures:**
 >[Condition Numbers](https://www.youtube.com/watch?v=ih4d0ZRZ60c&feature=youtu.be)
 >[Indefinite integration via Finite Differences](https://www.youtube.com/watch?v=Q2tjKg6HLno)
 >[Euler Methods](https://www.youtube.com/watch?v=5qoGvoVKr_s)
@@ -3974,11 +3969,9 @@ $$
 \end{align*}
 $$
 where $𝐮, 𝐟 : [0,T] → ℝ^d$ and $A : [0,T] → ℝ^{d × d}$.
-We again discretise at the grid $t_k$
-by approximating $𝐮(t_k) ≈ 𝐮_k ∈ ℝ^d$.
-This can be reduced to a block-bidiagonal system as in
-the scalar case which is solved via forward-substitution. Though
-it's easier to think of it directly. 
+We again discretise at the grid $t_k$ by approximating $𝐮(t_k) ≈ 𝐮_k ∈ ℝ^d$.
+This can be reduced to a block-bidiagonal system as in the scalar case which is solved via forward-substitution. 
+Though it's easier to think of it directly. 
 
 Forward Euler gives us:
 $$
@@ -4102,15 +4095,11 @@ Both match!
 Euler blows up while backward Euler does not. This will be discussed in the problem
 sheet.
 
-**<span style="color:#005757">Remark:</span> (advanced)** Memory allocations are very expensive so
-in practice one should preallocate and use memory. 
-
+**<span style="color:#005757">Remark:</span> (advanced)** Memory allocations are very expensive so in practice one should preallocate and use memory. 
 
 ### Nonlinear problems
 
-Forward-Euler extends naturally to nonlinear equations, 
-including the
-vector case:
+Forward-Euler extends naturally to nonlinear equations, including the vector case:
 $$
 𝐮' = f(t, 𝐮(t))
 $$
@@ -4138,8 +4127,7 @@ end
 
 plot(x, first.(𝐮))
 ```
-As we see it correctly predicts the oscillatory behaviour of
-a pendulum, and matches the simulation using DifferentialEquations.jl
+As we see it correctly predicts the oscillatory behaviour of a pendulum, and matches the simulation using DifferentialEquations.jl
 above.
 
 
@@ -4263,14 +4251,13 @@ We will use _Toeplitz matrices_ as a tool to simplify the explanation.
 >$$
 
 ==**Proof**== 
-We prove the error bound for forward Euler as backward Euler is
-similar. This proof consists of two stages: (1) consistency and
-(2) stability. 
+We prove the error bound for forward Euler as backward Euler is similar.
+This proof consists of two stages: (1) consistency and (2) stability. 
 
-_Consistency_ means our discretisation approximates the
-true equation, that is:
+_Consistency_ means our discretisation approximates the true equation, that is:
 $$
-L𝐮 = \begin{bmatrix} c \\
+\begin{align*}
+L𝐮 &= \begin{bmatrix} c \\
         {u(t_2) - u(t_1) \over h} + a u(t_1) \\
         ⋮ \\
         {u(t_n) - u(t_{n-1}) \over h} + a u(t_{n-1}) 
@@ -4278,18 +4265,20 @@ L𝐮 = \begin{bmatrix} c \\
         u'(t_1) + a u(t_1) + u''(τ_1) h \\
         ⋮ \\
         u'(t_{n-1}) + a u(t_{n-1}) + u''(τ_{n-1}) h
-\end{bmatrix} = \begin{bmatrix} c \\
+\end{bmatrix} \\
+\\
+&= \begin{bmatrix} c \\
         f(t_1) + u''(τ_1) h \\
         ⋮ \\
         f(t_{n-1}) + u''(τ_{n-1}) h
-\end{bmatrix} = \begin{bmatrix} c \\ 𝐟ᶠ \end{bmatrix} + \begin{bmatrix} 0 \\ δ \end{bmatrix}
+\end{bmatrix}
+= \begin{bmatrix} c \\ 𝐟ᶠ \end{bmatrix} + \begin{bmatrix} 0 \\ δ \end{bmatrix}
+\end{align*}
 $$
 where $t_k ≤ τ_k ≤ t_{k+1}$, and uniform boundedness
 implies that $\|δ\|_∞ = O(h)$, or in other words $\|δ\|_1 = O(1)$. 
 
-_Stability_ means the inverse does not
-blow up the error. We need to be a bit careful and
-first write, for $ℓ = 1 + h a$,
+_Stability_ means the inverse does not blow up the error. We need to be a bit careful and first write, for $ℓ = 1 + h a$,
 $$
 L = \underbrace{\begin{bmatrix} 1 \\ & h^{-1} \\ && ⋱ \\ &&& h^{-1} \end{bmatrix}}_D
  \underbrace{\begin{bmatrix} 1 \\ 
@@ -4306,19 +4295,18 @@ $$
 $$
 
 
-We now combine stability and consistency. have
+We now combine stability and consistency. We have:
 $$
 \|𝐮ᶠ - 𝐮\|_∞  = \|L^{-1} (L𝐮ᶠ - L𝐮)\|_∞  = \|L̃^{-1} D^{-1} \begin{bmatrix} 0 \\ δ \end{bmatrix} \|_∞ 
 ≤ h \|L̃^{-1}\|_{1 → ∞} \|δ\|_1 = O(h).
 $$
 
-∎
+
 
 
 #### Poisson
 
-For 2D problems we consider Poisson. The first stage is to
-row-reduce to get a symmetric tridiagonal (pos. def.) matrix:
+For 2D problems we consider Poisson. The first stage is to row-reduce to get a symmetric tridiagonal (pos. def.) matrix:
 $$
 \begin{bmatrix} 
 1 \\
@@ -4331,14 +4319,17 @@ $$
     1/h^2 & -2/h^2 & 1/h^2 \\
         & ⋱ & ⋱ & ⋱ \\
         && 1/h^2 & -2/h^2 & 1/h^2 \\
-        &&&& 1 \end{bmatrix} = 
-\begin{bmatrix}
+        &&&& 1 \end{bmatrix} \\
+$$
+$$
+= \begin{bmatrix} 
     1 \\
     0 & -2/h^2 & 1/h^2 \\
         & ⋱ & ⋱ & ⋱ \\
         && 1/h^2 & -2/h^2 & 0 \\
         &&&& 1 \end{bmatrix}.
 $$
+
 Considering the right-hand side and dropping
 the first and last rows our equation becomes:
 $$
@@ -4351,10 +4342,8 @@ $$
                 u_2 \\ ⋮ \\ u_{n-1} \end{bmatrix} = \underbrace{\begin{bmatrix} f(x_2) - c_0/h^2 \\ f(x_3) \\ ⋮ \\ f(x_{n-2}) \\ f(x_{n-1}) - c_1/h^2 \end{bmatrix}}_{𝐟ᵖ}
 $$
 
-
 **<span style="color:#005757">Remark:</span> (advanced)** You may recognise $Δ$ as a discrete Laplacian corresponding to a graph with
-Dirichlet conditions,
-as discussed in first year applied mathematics.
+Dirichlet conditions, as discussed in first year applied mathematics.
 Thus one can interpret finite-differences as approximating a continuous differential equation by
 a graph. This view-point extends naturally to higher-dimensional equations. In the problem sheet we also
 discuss Neumann series.
@@ -4403,7 +4392,7 @@ $$
 \|𝐮ᶠ - 𝐮\|_∞  = \|Δ^{-1} (Δ𝐮ᶠ - Δ𝐮)\|_∞  ≤ \|h^2  Δ^{-1}\|_∞  \| {\bf\delta} \|_∞ = O(n^{-2})
 $$
 
-∎
+
 
 What about the observed instability? The condition number of the matrix provides an intuition
 (though not a proof: condition numbers are only upper bounds!).  Here we have
@@ -4415,15 +4404,16 @@ Thus we _expect_ floating-point errors to magnified propotional to $n^2$ in the 
 
 ---------------------------------------------------------------
 
-## Fourier series
+## Fourier Series & Transform
 >**YouTube Lectures:**
 >[Fourier Series](https://www.youtube.com/watch?v=1jCVpILji9g)
 >[Trapezium Rule and Fourier Coefficients](https://www.youtube.com/watch?v=gPC_Ychx8SU)
+>[Discrete Fourier Transform (DFT)](https://www.youtube.com/watch?v=mva8YMkadVM)
+>[Fast Fourier Transform (FFT)](https://www.youtube.com/watch?v=vFliXKbxNBs)
 
 In Part III, Computing with Functions, we work with approximating functions by expansions in
 bases: that is, instead of approximating at a grid (as in the Differential Equations chapter),
-we approximate functions by other, simpler, functions. The most fundamental basis is (complex) Fourier
-series:
+we approximate functions by other, simpler, functions. The most fundamental basis is (complex) Fourier series:
 $$
 f(θ) = ∑_{k = -∞}^∞ f̂ₖ {\rm e}^{{\rm i} k θ}
 $$
@@ -4437,7 +4427,7 @@ $$
 f(θ) = \underbrace{[⋯ | {\rm e}^{-2{\rm i}θ} |{\rm e}^{-{\rm i}θ} | \underline 1 | {\rm e}^{{\rm i}θ} | {\rm e}^{2{\rm i}θ} | ⋯]}_{F(θ)}
 \underbrace{\begin{bmatrix} ⋮ \\ f̂_{-2} \\ f̂_{-1} \\ \underline{f̂_0} \\ f̂_1 \\ f̂_2 \\ ⋮ \end{bmatrix}}_𝐟̂
 $$
-where the underline indicates the zero-index location.
+Where the underline indicates the zero-index location.
 
 More precisely, we are going to build an approximation using $n$ approximate coefficients $f̂_k^n ≈ f̂_k$.
 We separate this into three cases:
@@ -4468,9 +4458,7 @@ This can be thought of as an approximate Taylor expansion using the change-of-va
 
 
 
-In analysis one typically works with continuous functions and relates results to continuity.
-In numerical analysis we inheritely have to work with _vectors_, so it is more natural
-to  focus on the case where the _Fourier coefficients_ $f̂_k$ are _absolutely convergent_,
+In analysis one typically works with continuous functions and relates results to continuity. In numerical analysis we inheritely have to work with _vectors_, so it is more natural to  focus on the case where the _Fourier coefficients_ $f̂_k$ are _absolutely convergent_, 
 or in otherwords, the $1$-norm of $𝐟̂$ is bounded:
 $$
 \|𝐟̂\|_1 = ∑_{k=-∞}^∞ |f̂_k| < ∞
@@ -4491,8 +4479,7 @@ of the $2$-norm,
 $$
 \| f \|_2 := \sqrt{\int_0^{2π} |f(θ)|^2 {\rm d} θ},
 $$
-for any function such that $\| f \|_2 < ∞$, but we won't need that in
-what follows.
+for any function such that $\| f \|_2 < ∞$, but we won't need that in what follows.
 
 
 Fortunately, continuity gives us sufficient (though not necessary) conditions for absolute convergence:
@@ -4519,7 +4506,7 @@ $$
 $$
 using the dominant convergence test.
 
-∎
+
 
 This condition can be weakened to Lipschitz continuity but the proof is  beyond the scope
 of this module.
@@ -4583,7 +4570,7 @@ $$
 $$
 where we use the fact that $k$ is not a multiple of $n$ to guarantee that $ω^k ≠ 1$.
 
-∎
+
 
 
 >**Theorem (discrete Fourier coefficients)**
@@ -4601,7 +4588,7 @@ f̂_k^n &= Σ_n[f(θ) {\rm e}^{-i k θ}] = ∑_{j=-∞}^∞ f̂_j Σ_n[f(θ) {\r
 \end{cases}
 \end{align*}
 $$
-∎
+
 
 Note that there is redundancy:
 
@@ -4661,13 +4648,12 @@ coefficients are zero.
 
 $$
 \begin{align*}
-|f(θ) - f_n(θ)| = |∑_{k=0}^{n-1} (f̂_k - f̂_k^n) {\rm e}^{{\rm i} k θ} + ∑_{k=n}^∞ f̂_k {\rm e}^{{\rm i} k θ}|
-= |∑_{k=n}^∞ f̂_k ({\rm e}^{{\rm i} k θ} - {\rm e}^{{\rm i} {\rm mod}(k,n) θ})|
+|f(θ) - f_n(θ)| &= |∑_{k=0}^{n-1} (f̂_k - f̂_k^n) {\rm e}^{{\rm i} k θ} + ∑_{k=n}^∞ f̂_k {\rm e}^{{\rm i} k θ}| \\
+&= |∑_{k=n}^∞ f̂_k ({\rm e}^{{\rm i} k θ} - {\rm e}^{{\rm i} {\rm mod}(k,n) θ})|
 ≤ 2 ∑_{k=n}^∞ |f̂_k|
 \end{align*}
 $$
 which goes to zero as $n → ∞$.
-∎
 
 For the general case we need to choose a range of coefficients that includes roughly an equal number of
 negative and positive coefficients (preferring negative over positive in a tie as a convention):
@@ -4675,12 +4661,6 @@ $$
 f_n(θ) = ∑_{k=-⌈n/2⌉}^{⌊n/2⌋} f̂ₖ {\rm e}^{{\rm i} k θ}
 $$
 In the problem sheet we will prove this converges provided the coefficients are absolutely convergent.
-
-
-
-
-
-
 
 ### 3. Discrete Fourier transform and interpolation
 
@@ -4742,7 +4722,7 @@ Q_n Q_n^⋆  = \begin{bmatrix} Σ_n[1] & Σ_n[{\rm e}^{{\rm i} θ}] & ⋯ & Σ_n
                             Σ_n[{\rm e}^{-{\rm i}(n-1) θ}] & Σ_n[{\rm e}^{-{\rm i}(n-2) θ}] & ⋯ & Σ_n[1]
                             \end{bmatrix} = I
 $$
-∎
+
 
 In other words, $Q_n$ is easily inverted and we also have a map from discrete Fourier coefficients back to values:
 $$
@@ -4761,7 +4741,7 @@ $$
 f_n(θ_j) = ∑_{k=0}^{n-1} f̂_k^n {\rm e}^{{\rm i} k θ_j} = √n 𝐞_j^⊤ Q_n^⋆ 𝐟̂ⁿ = 𝐞_j^⊤ Q_n^⋆ Q_n 𝐟ⁿ = f(θ_j).
 $$
 
-∎
+
 
 
 We will leave extending this result to the problem sheet. Note that regardless of choice of coefficients
@@ -4873,8 +4853,8 @@ and so $P_σ^⊤$ reverses the process.
 Thus we have
 $$
 \begin{align*}
-Q_{2n}^⋆ &= {1 \over \sqrt{2n}} \begin{bmatrix} 𝟏_{2n} | \vec{ω}_{2n} | \vec{ω}_{2n}^2 | ⋯ | \vec{ω}_{2n}^{2n-1} \end{bmatrix}
-= {1 \over \sqrt{2n}} P_σ^⊤ \begin{bmatrix} 𝟏_{n} &   \vec{ω}_n        & \vec{ω}_n^2          & ⋯ & \vec{ω}_n^{n-1}          & \vec{ω}_n^n  & ⋯ & \vec{ω}_n^{2n-1}  \\
+Q_{2n}^⋆ &= {1 \over \sqrt{2n}} \begin{bmatrix} 𝟏_{2n} | \vec{ω}_{2n} | \vec{ω}_{2n}^2 | ⋯ | \vec{ω}_{2n}^{2n-1} \end{bmatrix} \\
+&= {1 \over \sqrt{2n}} P_σ^⊤ \begin{bmatrix} 𝟏_{n} &   \vec{ω}_n        & \vec{ω}_n^2          & ⋯ & \vec{ω}_n^{n-1}          & \vec{ω}_n^n  & ⋯ & \vec{ω}_n^{2n-1}  \\
                         𝟏_{n} & ω_{2n} \vec{ω}_n & ω_{2n}^2 \vec{ω}_n^2 & ⋯ & ω_{2n}^{n-1} \vec{ω}_n^{n-1} & ω_{2n}^n \vec{ω}_n^n  & ⋯ & ω_{2n}^{2n-1} \vec{ω}_n^{2n-1}
 \end{bmatrix} \\
 &= {1 \over \sqrt{2}} P_σ^⊤ \begin{bmatrix} Q_n^⋆ & Q_n^⋆ \\
@@ -4985,5 +4965,651 @@ S_n(n-1)
                                 \exp({\rm e}^{2{\rm i} π/n}) \\
                                 ⋮ \\
                                 \exp({\rm e}^{2{\rm i} (n-1) π/n}) \end{bmatrix}
+$$
+--------------------------------------------------------------
+
+## Orthogonal Polynomials
+>**YouTube Lectures:**
+>[Orthogonal Polynomials](https://www.youtube.com/watch?v=mTf4688vmaU)
+
+Fourier series proved very powerful for approximating periodic functions.
+If periodicity is lost, however, uniform convergence is lost. In this chapter
+we introduce alternative bases, _orthogonal polynomials (OPs)_ built on polynomials that are applicable in
+the non-periodic setting. That is we consider expansions of the form
+$$
+f(x) = \sum_{k=0}^∞ c_k p_k(x) ≈ \sum_{k=0}^{n-1} c_k^n p_k(x)
+$$
+where $p_k(x)$ are special families of polynomials, $c_k$ are expansion coefficients and
+$c_k^n$ are approximate coefficients.
+
+Why not use monomials as in Taylor series? Hidden in the previous lecture was that we could effectively
+compute Taylor coefficients by evaluating on the unit circle in the complex plane, _only_ if the radius of convergence
+was 1. Many functions are smooth on say $[-1,1]$ but have non-convergent Taylor series, e.g.:
+$$
+{1 \over 25x^2 + 1}
+$$
+While orthogonal polynomials span the same space as monomials, and therefore we can in theory write an
+approximation in monomials, orthogonal polynomials are _much_ more stable.
+
+
+
+In addition to numerics, OPs play a very important role in many mathematical areas
+including functional analysis, integrable systems, singular integral equations,
+complex analysis, and random matrix theory.
+
+1. General properties of OPs: we define orthogonal polynomials, three-term recurrences and Jacobi operators
+2. Classical OPs: we define Chebyshev, Legendre, Jacobi, Laguerre, and Hermite.
+3. Gaussian quadrature: we see that OPs can be used to construct effective numerical methods for singular integrals
+4. Recurrence relationships and Sturm–Liouville equations: we see that classical OPs have many simple recurrences that
+are of importance in computation, which also show they are eigenfunctions of simple differential operators.
+
+
+### 1. General properties of orthogonal polynomials
+
+>**Definition (graded polynomial basis)**
+>A set of polynomials $\{p_0(x), p_1(x), … \}$ is _graded_ if $p_n$ is
+>precisely degree $n$: i.e.,
+>$$
+>p_n(x) = k_n x^n + k_n^{(n-1)} x^{n-1} + ⋯ + k_n^{(1)} x + k_n^{(0)}
+>$$
+>for $k_n ≠ 0$.
+
+Note that if $p_n$ are graded then $\{p_0(x), …, p_n(x) \}$
+are a basis of all polynomials of degree $n$.
+
+
+>**Definition (orthogonal polynomials)**
+>Given an (integrable) _weight_ $w(x) > 0$ for $x ∈ (a,b)$,
+>which defines a continuous inner product
+>$$
+>⟨f,g⟩ = ∫_a^b  f(x) g(x) w(x) {\rm d} x
+>$$
+>a graded polynomial basis $\{p_0(x), p_1(x), … \}$
+>are _orthogonal polynomials (OPs)_ if
+>$$
+>⟨p_n,p_m⟩ = 0
+>$$
+>whenever $n ≠ m$.
+
+
+Note in the above
+$$
+h_n := ⟨p_n,p_n⟩ = \|p_n\|^2 = ∫_a^b  p_n(x)^2 w(x) {\rm d} x > 0.
+$$
+
+>**Definition (orthonormal polynomials)**
+>A set of orthogonal polynomials $\{q_0(x), q_1(x), … \}$
+>are orthonormal if $\|q_n\| = 1$.
+
+>**Definition (monic orthogonal polynomials)**
+>A set of orthogonal polynomials $\{q_0(x), q_1(x), … \}$
+>are orthonormal if $k_n = 1$.
+
+
+>**Proposition (expansion)**
+>If $r(x)$ is a degree $n$ polynomial, $\{p_n\}$ are orthogonal
+>and $\{q_n\}$ are orthonormal then
+>$$
+>\begin{align*}
+>r(x) &= ∑_{k=0}^n {⟨p_k,r⟩ \over \|p_k\|^2} p_k(x) \\
+>     &    = ∑_{k=0}^n ⟨q_k,r⟩ q_k(x)
+>\end{align*}
+>$$
+
+==**Proof**==
+Because $\{p_0,…,p_n \}$ are a basis of polynomials we can
+write
+$$
+r(x) = ∑_{k=0}^n r_k p_k(x)
+$$
+for constants $r_k ∈ ℝ$.
+By linearity we have
+$$
+⟨p_m,r⟩ = ∑_{k=0}^n r_k ⟨p_m,p_k⟩= r_m ⟨p_m,p_m⟩
+$$
+
+
+>**Corollary (zero inner product)**
+>If a degree $n$ polynomial $r$ satisfies
+>$$
+>0 = ⟨p_0,r⟩ = … = ⟨p_n,r⟩
+>$$
+>then $r = 0$.
+
+
+OPs are uniquely defined (up to a constant) by the
+property that they are orthogonal to all lower degree polynomials.
+
+>**Proposition (orthogonal to lower degree)**
+>A polynomial $p$ of precisely degree $n$ satisfies
+>$$
+>⟨p,r⟩ = 0
+>$$
+>for all degree $m < n$ polynomials $r$ if and only if
+>$p = c q_n$. Therefore an orthogonal polynomial is uniquely
+>defined by $k_n$.
+
+==**Proof**==
+As $\{p_0,…,p_n\}$ are a basis of all polynomials of degree $n$,
+we can write
+$$
+r(x) = ∑_{k=0}^m a_k p_k(x)
+$$
+Thus by linearity of inner products we have
+$$
+⟨cp_n,∑_{k=0}^m a_k p_k⟩ = ∑_{k=0}^m ca_k ⟨p_n, p_k⟩ = 0.
+$$
+
+Now for
+$$
+p(x) = c x^n + O(x^{n-1})
+$$
+consider $p(x) - c p_n(x)$ which is of degree $n-1$. It satisfies
+for $k ≤ n-1$
+$$
+⟨p_k, p - c p_n⟩ = ⟨p_k, p⟩ - c ⟨p_k, p_n⟩ = 0.
+$$
+Thus it is zero, i.e., $p(x) = c p_n(x)$.
+
+
+
+A consequence of this is that orthonormal polynomials are always a
+constant multiple of orthogonal polynomials.
+
+
+#### 3-term recurrence
+
+The most _fundamental_ property of orthogonal polynomials is their three-term
+recurrence.
+
+>**Theorem (3-term recurrence, 2nd form)**
+>If $\{p_n\}$ are OPs then there exist real constants
+>$a_n, b_n ≠0,c_{n-1} ≠0$
+>such that
+>$$
+>\begin{align*}
+>x p_0(x) &= a_0 p_0(x) + b_0 p_1(x)  \\
+>x p_n(x) &= c_{n-1} p_{n-1}(x) + a_n p_n(x) + b_n p_{n+1}(x)
+>\end{align*}
+>$$
+>==**Proof**==
+>The $n=0$ case is immediate since $\{p_0,p_1\}$ are a basis of degree 1 polynomials.
+>The $n >0$ case follows from
+>$$
+>⟨x p_n, p_k⟩ = ⟨ p_n, xp_k⟩ = 0
+>$$
+>for $k < n-1$ as $x p_k$ is of degree $k+1 < n$.
+
+Note that
+$$
+b_n = {⟨p_{n+1}, x p_n⟩ \over \|p_{n+1} \|^2} ≠ 0
+$$
+since $x p_n = k_n x^{n+1} + O(x^n)$ is precisely degree
+$n$. Further,
+$$
+c_{n-1} = {⟨p_{n-1}, x p_n⟩ \over \|p_{n-1}\|^2 } =
+{⟨p_n, x p_{n-1}⟩  \over \|p_{n-1}\|^2 } =  b_{n-1}{\|p_n\|^2  \over \|p_{n-1}\|^2 } ≠ 0.
+$$
+
+
+
+
+
+
+
+
+Clearly if $p_n$ is monic then so is $x p_n$ which leads to the following:
+
+>**Corollary (monic 3-term recurrence)** If
+>$\{p_n\}$ are monic then $b_n =  1$.
+
+
+**<span style="color:#008080">Example</span>** What are the  monic OPs $p_0(x),…,p_3(x)$ with respect to $w(x) = 1$ on $[0,1]$?
+We can construct these using Gram–Schmidt, but exploiting the 3-term recurrence to reduce the computational cost.
+We have $p_0(x) = q_0(x) = 1$, which we see is orthogonal:
+$$
+\|p_0\|^2 = ⟨p_0,p_0⟩ = ∫_0^1 d x = 1.
+$$
+We know from the 3-term recurrence that
+$$
+x p_0(x) = a_0 p_0(x) +  p_1(x)
+$$
+where
+$$
+a_0 = {⟨p_0,x p_0⟩  \over \|p_0\|^2} = ∫_0^1 x {\rm d} x = 1/2.
+$$
+Thus
+$$
+\begin{align*}
+p_1(x) = x p_0(x) - a_0 p_0(x) = x-1/2 \\
+\|p_1\|^2 = ∫_0^1 (x^2 - x + 1/4) {\rm d} x = 1/12
+\end{align*}
+$$
+From
+$$
+x p_1(x) = c_0 p_0(x) + a_1 p_1(x) +  p_2(x)
+$$
+we have
+$$
+\begin{align*}
+c_0 &= {⟨p_0,x p_1⟩  \over \|p_0\|^2} = ∫_0^1 (x^2 - x/2) {\rm d} x = 1/12 \\
+a_1 &= {⟨p_1,x p_1⟩  \over \|p_1\|^2} = 12 ∫_0^1 (x^3 - x^2 + x/4) {\rm d} x = 1/2 \\
+p_2(x) &= x p_1(x) - c_0 - a_1 p_1(x) = x^2 - x + 1/6 \\
+\|p_2\|^2 &= \int_0^1 (x^4 - 2x^3 + 4x^2/3 - x/3 + 1/36) {\rm d} x = {1 \over 180}
+\end{align*}
+$$
+Finally, from
+$$
+x p_2(x) = c_1 p_1(x) + a_2 p_2(x) +  p_3(x)
+$$
+we have
+$$
+\begin{align*}
+c_1 &= {⟨p_1,x p_2⟩  \over \|p_1\|^2} = 12 ∫_0^1 (x^4 - 3x^3/2 +2x^2/3 -x/12)  {\rm d} x = 1/15 \\
+a_2 &= {⟨p_2,x p_2⟩  \over \|p_2\|^2} = 180 ∫_0^1 (x^5 - 2x^4 +4x^3/3 - x^2/3 + x/36) {\rm d} x = 1/2 \\
+p_3(x) &= x p_2(x) - c_1 p_1(x)- a_2 p_2(x) = x^3 - x^2 + x/6 - x/15 + 1/30 -x^2/2 + x/2 - 1/12 \\
+&= x^3 - 3x^2/2 + 3x/5 -1/20
+\end{align*}
+$$
+
+
+#### Jacobi matrix
+
+
+The three-term recurrence can also be interpreted as a matrix known
+as the Jacobi matrix:
+
+>**Corollary (Jacobi matrix)**
+>For
+>$$
+>P(x) := [p_0(x) | p_1(x) | ⋯]
+>$$
+>then we have
+>$$
+>x P(x) = P(x) \underbrace{\begin{bmatrix} a_0 & c_0 \\
+>                                                        b_0 & a_1 & c_1\\
+>                                                        & b_1 & a_2 & ⋱ \\
+>                                                        && ⋱ & ⋱
+>                                                        \end{bmatrix}}_X
+>$$
+>More generally, for any polynomial $a(x)$ we have
+>$$
+>a(x) P(x) = P(x) a(X).
+>$$
+
+For the special cases of orthonormal and monic polynomials we have extra structure:
+
+>**Corollary (orthonormal 3-term recurrence)** If
+>$\{q_n\}$ are orthonormal then its recurrence coefficients satisfy $c_n = b_n$.
+>That is, the Jacobi matrix is symmetric:
+>$$
+>X = \begin{bmatrix} a_0 & b_0 \\
+>                                                        b_0 & a_1 & b_1\\
+>                                                        & b_1 & a_2 & ⋱ \\
+>                                                        && ⋱ & ⋱
+>                                                        \end{bmatrix}
+>$$
+
+==**Proof**==
+$$
+b_n = ⟨x q_n, q_{n+1}⟩ = ⟨q_n, x q_{n+1}⟩ = c_{n-1}.
+$$
+
+
+
+
+**Remark** Typically the Jacobi matrix is the transpose $J := X^⊤$.
+If the basis are orthonormal then $X$ is symmetric and they are the same.
+
+**Remark (advanced)** If you are worried about multiplication of infinite matrices/vectors
+note it is well-defined by the standard definition because it is banded.
+It can also be defined in terms of functional analysis where one considers these
+as linear operators (functions of functions) between vector spaces.
+
+**Remark (advanced)** Every integrable weight generates a family of
+orthonormal polynomials, which in turn generates a symmetric Jacobi matrix.
+>There is a "Spectral Theorem for Jacobi matrices" that says one can go the
+>other way: every tridiagonal symmetric matrix with bounded entries is a Jacobi
+>matrix for some integrable weight with compact support. This is an example of what
+>[Barry Simon](https://en.wikipedia.org/wiki/Barry_Simon) calls a ''Gem of spectral theory'',
+>that is.
+
+
+**<span style="color:#008080">Example</span> (uniform weight Jacobi matrix)** Consider the
+monic orthogonal polynomials $p_0(x),p_1(x),…,p_3(x)$ for $w(x) = 1$ on $[0,1]$ constructed above.
+We can write the 3-term recurrence coefficients we have computed above as the Jacobi matrix:
+$$
+x [p_0(x)| p_1(x)| ⋯] = [p_0(x)| p_1(x)| ⋯] \underbrace{\begin{bmatrix} 1/2 & 1/12 \\
+                                                            1 & 1/2 & 1/15 \\
+                                                            & 1 & 1/2 & ⋱ \\
+                                                            & & ⋱ & ⋱ \end{bmatrix}}_X
+$$
+We can compute the orthonormal polynomials, using
+$$
+\|p_3\|^2 = \int_0^1 (x^6 - 3x^5 + 69x^4/20 -19x^3/10 + 51x^2/100 - 3x/50 + 1/400) {\rm d}x = {1 \over 2800}
+$$
+as:
+$$
+\begin{align*}
+q_0(x) &= p_0(x) \\
+q_1(x) &= \sqrt{12} p_1(x)= \sqrt{3} (2  x - 1) \\
+q_2(x) &= \sqrt{180} p_2(x) = \sqrt{5} (6x^2 - 6x + 1) \\
+q_3(x) &= \sqrt{2800} p_3(x) = \sqrt{7} (20x^3-30x^2 + 12x - 1)
+\end{align*}
+$$
+which have the Jacobi matrix
+$$
+\begin{align*}
+x [q_0(x)| q_1(x)| ⋯] &= x [p_0(x)| p_1(x)| ⋯] \underbrace{\begin{bmatrix} 1 \\ & 2\sqrt{3} \\ && 6 \sqrt{5} \\ &&& 20 \sqrt{7} \\
+&&&& ⋱
+\end{bmatrix}}_D \\
+&= [q_0(x)| q_1(x)| ⋯] D^{-1} X D \\
+\\
+&= \begin{bmatrix} 1/2 & 1/\sqrt{12} \\
+                    1/\sqrt{12} & 1/2 &  1/\sqrt{15} \\
+                    & 1/\sqrt{15} & 1/2 & ⋱ \\
+                    & ⋱ & ⋱ \end{bmatrix}
+\end{align*}
+$$
+which is indeed symmetric. The problem sheet explores a more elegant way of doing this.
+
+
+**<span style="color:#008080">Example</span> (expansion)** Consider expanding a low degree polynomial like $f(x) = x^2$ in $p_n(x)$. We have
+$$
+⟨p_0, f⟩ = ∫_0^1 x^2 {\rm d} x = 1/3
+⟨p_1, f⟩ = ∫_0^1 x^2 (x - 1/2) {\rm d} x = 1/12
+⟨p_2, f⟩ = ∫_0^1 x^2 (x^2 - x + 1/6) {\rm d} x \\
+= 1/180
+$$
+Thus we have:
+$$
+f(x) = {p_0(x) \over 3} + p_1(x) + p_2(x) = [p_0(x) | p_1(x) | p_2(x) | ⋯] \begin{bmatrix} 1/3 \\ 1 \\ 1 \\ 0 \\ ⋮ \end{bmatrix}
+$$
+We multiply (using that $b_2 = 1$ for monic OPs) to deduce:
+$$
+\begin{align*}
+x f(x) &= x[p_0(x) | p_1(x) | p_2(x) | ⋯] \begin{bmatrix} 1/3 \\ 1 \\ 1 \\ 0 \\ ⋮ \end{bmatrix} \\
+\\
+&= [p_0(x) | p_1(x) | p_2(x) | ⋯] X \begin{bmatrix} 1/3 \\ 1 \\ 1 \\ 0 \\ ⋮ \end{bmatrix} \\
+\\
+&= [p_0(x) | p_1(x) | p_2(x) | ⋯]  \begin{bmatrix} 1/4 \\ 9/10 \\ 3/2 \\ 1 \\ 0 \\ ⋮ \end{bmatrix} \\
+\\
+&= {p_0(x) \over 4} + {9 p_1(x) \over 10} + {3 p_2(x) \over 2} + p_3(x)
+\end{align*}
+$$
+
+
+
+
+### 2. Classical orthogonal polynomials
+
+Classical orthogonal polynomials are special families of orthogonal polynomials with a number
+of beautiful properties, for example
+1. Their derivatives are also OPs
+2. They are eigenfunctions of simple differential operators
+
+As stated above orthogonal polynomials are uniquely defined by the weight
+$w(x)$ and the constant $k_n$. We consider:
+
+1. **Chebyshev** polynomials (1st kind) $T_n(x)$: $w(x) = 1/\sqrt{1-x^2}$ on $[-1,1]$.
+2.  **Chebyshev** polynomials (2nd kind) $U_n(x)$: $\sqrt{1-x^2}$ on $[-1,1]$.
+2. **Legendre** polynomials $P_n(x)$: $w(x) = 1$ on $[-1,1]$.
+3. **Hermite** polynomials $H_n(x): w(x) = \exp(-x^2)$  on $(-\infty,\infty)$.
+
+Other important families discussed are
+
+1. **Ultrapsherical** polynomials
+2. **Jacobi** polynomials
+3. **Laguerre** polynomials
+
+
+#### Chebyshev
+
+>**Definition (Chebyshev polynomials, 1st kind)** $T_n(x)$ are orthogonal with respect to $1/\sqrt{1-x^2}$
+>and satisfy:
+>$$
+>T_0(x) = 1, T_n(x) = 2^{n-1} x^n + O(x^{n-1})
+>$$
+
+
+>**Definition (Chebyshev polynomials, 2nd kind)** $T_n(x)$ are orthogonal with respect to $1/\sqrt{1-x^2}$.
+>$$
+>U_n(x) = 2^n x^n + O(x^{n-1})
+>$$
+
+
+>**Theorem (Chebyshev T are cos)**
+>$$
+>T_n(x) = \cos(n\cos^{-1}(x))
+>$$
+>In other words
+>$$
+>T_n(cos(θ)) = \cos (n θ).
+>$$
+
+
+==**Proof**==
+
+We need to show that $p_n(x) := \cos(n\cos^{-1}(x))$ are
+1. graded polynomials
+2. orthogonal w.r.t. $1/\sqrt{1-x^2}$ on $[-1,1]$, and
+3. have the right normalisation constant $k_n = 2^{n-1}$ for $n = 2,…$.
+
+Property (2) follows under a change of variables:
+$$
+\int_{-1}^1 {p_n(x) p_m(x) \over \sqrt{1-x^2}} {\rm d} x =
+\int_{-π}^π {cos(nθ) cos(mθ) \over \sqrt{1-cos^2 θ}} \sin θ {\rm d} θ =
+\int_{-π}^π cos(nθ) cos(mθ) {\rm d} x = 0
+$$
+if $n ≠ m$.
+
+To see that they are graded we use the fact that
+$$
+x p_n(x) = \cos θ \cos n θ = {\cos(n-1)θ + cos(n+1)θ \over 2} = {p_{n-1}(x) + p_{n+1}(x) \over 2}
+$$
+In other words $p_{n+1}(x) = 2x p_n(x) - p_{n-1}(x)$.
+Since each time we multiply by $2x$ and $p_0(x) = 1$ we have
+$$
+p_n(x) = (2x)^n + O(x^{n-1})
+$$
+which completes the proof.
+
+
+
+Buried in the proof is the 3-term recurrence:
+
+>**Corollary**
+>$$
+>\begin{align*}
+>x T_0(x) = T_1(x) \\
+>x T_n(x) = {T_{n-1}(x) + T_{n+1}(x) \over 2}
+>\end{align*}
+>$$
+
+In the problem sheet you will show the following:
+
+>**Theorem (Chebyshev U are sin)**
+>For $x = \cos θ$,
+>$$
+>U_n(x) = {\sin(n+1) θ \over \sin θ}
+>$$
+>which satisfy:
+>$$
+>\begin{align*}
+>x U_0(x) &= U_1(x)/2 \\
+>x U_n(x) &= {U_{n-1}(x) \over 2} + {U_{n+1}(x) \over 2}.
+>\end{align*}
+>$$
+
+#### Legendre
+
+>**Definition (Pochhammer symbol)** The Pochhammer symbol is
+>$$
+>\begin{align*}
+>(a)_0 &= 1 \\
+>(a)_n &= a (a+1) (a+2) ⋯ (a+n-1).
+>\end{align*}
+>$$
+
+>**Definition (Legendre)** Legendre polynomials
+>$P_n(x)$ are orthogonal polynomials with respect to $w(x) = 1$ on $[-1,1]$, with
+>$$
+>k_n = {2^n (1/2)_n \over n!}
+>$$
+
+The reason for this complicated normalisation constant is both historical and
+that it leads to simpler formulae for recurrence relationships.
+
+
+Classical orthogonal polynomials have _Rodriguez formulae_, defining orthogonal
+polynomials as high order derivatives of simple functions. In this case we have:
+
+>**Theorem (Legendre Rodriguez)**
+>$$
+>P_n(x) = {1 \over (-2)^n n!}{{\rm d}^n \over {\rm d} x^n} (1-x^2)^n
+>$$
+
+==**Proof**==
+We need to verify:
+1. graded polynomials
+2. orthogonal to all lower degree polynomials on $[-1,1]$, and
+3. have the right normalisation constant $k_n = {2^n (1/2)_n \over n!}$.
+
+(1) follows since its a degree $n$ polynomial (the $n$-th derivative of a degree $2n$ polynomial).
+(2) follows by integration by parts. Note that $(1-x^2)^n$ and its first $n-1$ derivatives vanish at $\pm 1$.
+If $r_m$ is a degree $m < n$ polynomial we have:
+$$
+\begin{align*}
+∫_{-1}^1 {{\rm d}^n \over {\rm d} ^n} (1-x^2)^n r_m(x) {\rm d}x
+&= -∫_{-1}^1 {{\rm d}^{n-1} \over {\rm d} x^{n-1}} (1-x^2)^n r_m'(x) {\rm d}x \\
+&= ⋯ = (-1)^n ∫_{-1}^1 (1-x^2) r_m^{(n)}(x) {\rm d}x = 0.
+\end{align*}
+$$
+(3) follows since:
+$$
+\begin{align*}
+{{\rm d}^n \over {\rm d} x^n}[(-1)^n x^{2n} + O(x^{2n-1})]
+&= (-1)^n 2n {{\rm d}^{n-1} \over {\rm d} x^{n-1}} x^{2n-1}+ O(x^{2n-1})] \\
+&= (-1)^n 2n (2n-1) {{\rm d}^{n-2} \over {\rm d} x^{n-2}} x^{2n-2}+ O(x^{2n-2})] \\
+&= ⋯ = (-1)^n 2n (2n-1) ⋯ (n+1) x^n + O(x^{n-1})
+\end{align*}
+$$
+which satisfies:
+$$
+(1/2)(1/2+1) ⋯ (n-1/2) = {1 \over 2^n} (1+2) ⋯ (2n-1)
+$$
+
+
+
+>**Theorem (Legendre 3-term recurrence)**
+
+TBA
+
+
+
+
+### 3. Gaussian quadrature
+
+Consider integration
+$$
+\int_a^b f(x) w(x) {\rm d}x.
+$$
+For periodic integration we approximated (using the Trapezium rule) an integral by a sum.
+We can think of it as a weighted sum:
+$$
+{1 \over 2π} \int_0^{2π} f(θ) {\rm d} θ ≈  ∑_{j=0}^{n-1} w_j f(θ_j)
+$$
+where $w_j = 1/n$. Replacing an integral by a weighted sum is a known as a _quadrature_ rule.
+This quadrature rule had several important properties:
+1. It was _exact_ for integrating trigonometric polynomials with 2n-1 coefficients
+$$
+p(θ) = \sum_{k=1-n}^{n-1} p̂_k \exp({\rm i}k θ)
+$$
+as seen by the formula
+$$
+∑_{j=0}^{n-1} w_j f(θ_j) = p̂_0^n = … + p̂_{n-1} + p̂_0 + p̂_n + ⋯ = p̂_0 = {1 \over 2π} \int_0^{2π} p(θ) {\rm d} θ
+$$
+2. It exactly recovered the coefficients ($p̂_k^n = p̂_k$) for expansions of trigonometric polynomials with $n$ coeffiicents:
+$$
+p(θ) = \sum_{k=-⌈(n-1)/2⌉}^{⌊(n-1)/2⌋} p̂_k \exp({\rm i}k θ)
+$$
+3. It converged fast for smooth, periodic functions $f$.
+
+In this section we consider other quadrature rules
+$$
+\int_a^b f(x) w(x) {\rm d}x ≈ \sum_{j=1}^n w_j f(x_j)
+$$
+We want to choose $w_j$ and $x_j$ so that the following properties are satisfied:
+1. It is _exact_ for integrating polynomials up to degree $2n-1$:
+$$
+p(θ) = \sum_{k=0}^{2n-1} c_k q_k(x)
+$$
+2. It exactly recovers the coefficients for expansions:
+$$
+p(θ) = \sum_{k=0}^{n-1} c_k q_k(x)
+$$
+3. It converges fast for smooth functions $f$.
+We will focus on properties (1) and (2) as property (3) is more involved.
+
+The key to property (1) is to use _roots (zeros) of $q_n(x)$_.
+
+>**Lemma** $q_n(x)$ has exactly $n$ distinct roots.
+
+==**Proof**==
+
+Suppose $x_1, …,x_j$ are the roots where $q_n(x)$ changes sign, that is,
+$$
+q_n(x) = c_j (x-x_j) + O((x-x_j)^2)
+$$
+for $c_j ≠ 0$. Then
+$$
+q_n(x) (x-x_1) ⋯(x-x_j)
+$$
+does not change sign.
+In other words:
+$$
+⟨q_n,(x-x_1) ⋯(x-x_j) ⟩ = \int_a^b q_n(x) (x-x_1) ⋯(x-x_j) {\rm d} x ≠ 0.
+$$
+This is only possible if $j = n$.
+
+
+
+
+
+>**Lemma (zeros)** The zeros $x_1, …,x_n$ of $q_n(x)$ are the eigenvalues of the truncated Jacobi matrix
+>$$
+>X_n := \begin{bmatrix} a_0 & b_0 \\
+>                         b_0 & ⋱ & ⋱ \\
+>                         & ⋱ & a_{n-2} & b_{n-2} \\
+>                         && b_{n-2} & a_{n-1} \end{bmatrix} ∈ ℝ^{n × n}.
+>$$
+>More precisely,
+>$$
+>X_n Q_n = Q_n \begin{bmatrix} x_1 \\ & ⋱ \\ && x_n \end{bmatrix}
+>$$
+>for the orthogonal matrix
+>$$
+>Q_n = \begin{bmatrix}
+>p_0(x_1) & ⋯ & p_0(x_n) \\
+>⋮  & ⋯ & ⋮  \\
+>p_{n-1}(x_1) & ⋯ & p_{n-1}(x_n)
+>\end{bmatrix}
+>$$
+
+==**Proof**==
+
+We construct the eigenvector (noting $b_{n-1} p_n(x_j) = 0$):
+$$
+X_n \begin{bmatrix} p_0(x_j) \\ ⋮ \\ p_{n-1}(x_j) \end{bmatrix} =
+\begin{bmatrix} a_0 p_0(x_j) + b_0 p_1(x_j) \\
+ b_0 p_0(x_j) + a_1 p_1(x_j) + b_1 p_2(x_j) \\
+⋮ \\
+b_{n-3} p_{n-3}(x_j) + a_{n-2} p_{n-2}(x_j) + b_{n-2} p_{n-1}(x_j) \\
+b_{n-2} p_{n-2}(x_j) + a_{n-1} p_{n-1}(x_j) + b_{n-1} p_n(x_j)
+\end{bmatrix} = x_j \begin{bmatrix} p_0(x_j) \\
+ p_1(x_j) \\
+⋮ \\
+p_n(x_j)
+\end{bmatrix}
 $$
 
