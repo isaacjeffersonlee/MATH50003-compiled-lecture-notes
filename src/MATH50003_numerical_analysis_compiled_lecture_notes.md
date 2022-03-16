@@ -896,18 +896,14 @@ $3 ϵ_{\rm m}$. Here `f(x)` itself is less than $2 ϵ_{\rm m}$ so this does not 
 relative accuracy. (Of course, a bad upper bound is not the same as a proof of inaccuracy,
 but here we observe the inaccuracy in practice.)
 
-
-
-
-
-
-## 5. High-precision floating-point numbers (advanced)
+### 5. High-precision floating-point numbers (advanced)
 
 It is possible to set the precision of a floating-point number
 using the `BigFloat` type, which results from the usage of `big`
 when the result is not an integer.
 For example, here is an approximation of 1/3 accurate
 to 77 decimal digits:
+
 ```julia
 big(1)/3
 ```
@@ -2182,7 +2178,7 @@ A \ f
 
 
 
-### 2. Reduced QR and Gram–Schmidt
+#### 2. Reduced QR and Gram–Schmidt
 
 
 How do we compute the QR decomposition? We begin with a method
@@ -2253,7 +2249,7 @@ $$
 That is, we are computing the reduced QR decomposition column-by-column. 
 Running this algorithm to $j = n$ completes the decomposition.
 
-#### Gram–Schmidt in action
+##### Gram–Schmidt in action
 
 We are going to compute the reduced QR of a random matrix
 ```julia
@@ -2309,7 +2305,7 @@ norm(A - Q*R)
 ```
 
 
-#### Complexity and stability
+##### Complexity and stability
 
 We see within the `for j = 1:n` loop that we have $O(mj)$ operations. Thus the 
 total complexity is $O(m n^2)$ operations.
@@ -2323,7 +2319,7 @@ Q,R = gramschmidt(A)
 norm(Q'Q-I)
 ```
 
-### 3. Householder reflections and QR
+#### 3. Householder reflections and QR
 
 As an alternative, we will consider using Householder reflections to introduce zeros below
 the diagonal.
@@ -5613,3 +5609,4 @@ p_n(x_j)
 \end{bmatrix}
 $$
 
+jkSkSk
